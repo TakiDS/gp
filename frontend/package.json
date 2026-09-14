@@ -27,7 +27,7 @@
     "@angular/compiler": "20.3.31",
     "@angular/core": "20.3.31",
     "@angular/forms": "20.3.31",
-    "@angular/platform-browser": "20.3.31",
+    "@angular/platform-browser": "22.1.6",
     "@angular/router": "20.3.31",
     "@tailwindcss/vite": "4.3.3",
     "apexcharts": "^5.3.6",
