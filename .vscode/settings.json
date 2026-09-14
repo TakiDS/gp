@@ -1,0 +1,5 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.debug.settings.envFile": "${workspaceFolder}/.env",
+    "java.compile.nullAnalysis.mode": "automatic"
+}

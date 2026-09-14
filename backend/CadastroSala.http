@@ -1,0 +1,7 @@
+POST http://localhost:8080/local/cadastrar
+Content-Type: application/json
+
+{
+   "local": "Almoxarifado Central",
+   "dataCriacao": "2026-01-15"
+}

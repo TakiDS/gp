@@ -1,0 +1,283 @@
+<form
+  [formGroup]="patrimonioForm"
+  (ngSubmit)="onSubmit()"
+  class="min-h-screen bg-background py-6 md:px-5 md:py-8 flex justify-center transition-colors duration-300"
+>
+  <div class="w-full max-w-7xl flex flex-col gap-6">
+    <div
+      class="flex items-center justify-between animate-in fade-in slide-in-from-top-3 duration-500"
+      style="animation-fill-mode: both"
+    >
+      <h1 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+        Adicionar Patrimônio
+      </h1>
+    </div>
+
+    <div
+      class="bg-card/40 rounded-xl shadow-sm border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100"
+      style="animation-fill-mode: both"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border">
+        <div
+          class="p-8 flex flex-col gap-6 animate-in fade-in slide-in-from-left-3 duration-500 delay-150"
+          style="animation-fill-mode: both"
+        >
+          <div class="pb-2 border-b border-border/50">
+            <h2 class="text-lg font-semibold text-foreground">Detalhes do Item</h2>
+            <p class="text-sm text-muted-foreground">Identificação e categorização do bem.</p>
+          </div>
+
+          <div
+            class="w-full animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+            style="animation-fill-mode: both"
+          >
+            <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+              Descrição <span class="text-red-500">*</span>
+            </label>
+            <input
+              formControlName="descricao"
+              z-input
+              placeholder="Ex: Notebook Dell Latitude 5420"
+              class="w-full h-11 bg-background border border-border rounded-lg px-3 text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-muted-foreground/50"
+            />
+            @if (
+              patrimonioForm.get('descricao')?.touched &&
+              patrimonioForm.get('descricao')?.hasError('required')
+            ) {
+              <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                >Campo obrigatório</span
+              >
+            }
+            @if (
+              patrimonioForm.get('descricao')?.touched &&
+              patrimonioForm.get('descricao')?.hasError('minlength')
+            ) {
+              <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                >A descrição deve ter no mínimo 3 caracteres</span
+              >
+            }
+          </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-250"
+            style="animation-fill-mode: both"
+          >
+            <div class="w-full">
+              <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+                Categoria <span class="text-red-500">*</span>
+              </label>
+              @if (ready()) {
+                <z-select zPlaceholder="Selecione a categoria" formControlName="uuid_categoria">
+                  @for (item of categories(); track item.uuid) {
+                    <z-select-item [zValue]="item.uuid">{{ item.nome }}</z-select-item>
+                  }
+                </z-select>
+              } @else {
+                <div class="h-10 w-full bg-border rounded animate-pulse"></div>
+              }
+              @if (
+                patrimonioForm.get('uuid_categoria')?.touched &&
+                patrimonioForm.get('uuid_categoria')?.invalid
+              ) {
+                <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                  >Campo obrigatório</span
+                >
+              }
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+                Local <span class="text-red-500">*</span>
+              </label>
+              @if (ready()) {
+                <z-select zPlaceholder="Selecione Local" formControlName="uuid_localizacao">
+                  @for (item of locais(); track item.uuid) {
+                    <z-select-item [zValue]="item.uuid">{{ item.local }}</z-select-item>
+                  }
+                </z-select>
+              } @else {
+                <div class="h-10 w-full bg-border rounded animate-pulse"></div>
+              }
+              @if (
+                patrimonioForm.get('uuid_localizacao')?.touched &&
+                patrimonioForm.get('uuid_localizacao')?.invalid
+              ) {
+                <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                  >Campo obrigatório</span
+                >
+              }
+            </div>
+          </div>
+
+          <div
+            class="w-full md:w-1/3 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-300"
+            style="animation-fill-mode: both"
+          >
+            <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+              Quantidade <span class="text-red-500">*</span>
+            </label>
+            <input
+              formControlName="quantidade"
+              type="number"
+              z-input
+              class="w-full h-11 bg-background border border-border text-foreground rounded-lg px-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none disabled:bg-muted disabled:text-muted-foreground/50 disabled:cursor-not-allowed"
+            />
+            @if (
+              patrimonioForm.get('quantidade')?.touched && patrimonioForm.get('quantidade')?.invalid
+            ) {
+              <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                >Campo obrigatório (mín. 1)</span
+              >
+            }
+            @if (patrimonioForm.get('numSerie')?.value) {
+              <p class="text-[10px] text-primary mt-1 font-medium">
+                Fixo em 1 quando há Nº de série.
+              </p>
+            }
+          </div>
+        </div>
+
+        <div
+          class="p-8 flex flex-col gap-6 bg-card/40 animate-in fade-in slide-in-from-right-3 duration-500 delay-150"
+          style="animation-fill-mode: both"
+        >
+          <div class="pb-2 border-b border-border/50">
+            <h2 class="text-lg font-semibold text-foreground">Aquisição e Finanças</h2>
+            <p class="text-sm text-muted-foreground">Dados fiscais e valores do patrimônio.</p>
+          </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-5 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+            style="animation-fill-mode: both"
+          >
+            <div class="max-w-[200px] lg:max-w-[285px]">
+              <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+                Data de Aquisição <span class="text-red-500">*</span>
+              </label>
+              <z-date-picker
+                formControlName="dataAquisicao"
+                zFormat="dd/MM/yyyy"
+                placeholder="dd/mm/aaaa"
+                class="w-full"
+              ></z-date-picker>
+              @if (
+                patrimonioForm.get('dataAquisicao')?.touched &&
+                patrimonioForm.get('dataAquisicao')?.invalid
+              ) {
+                <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                  >Campo obrigatório</span
+                >
+              }
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+                Valor Unitário (R$) <span class="text-red-500">*</span>
+              </label>
+              <input
+                formControlName="valorAquisicao"
+                type="text"
+                placeholder="R$ 0,00"
+                (input)="formatarMoeda($event)"
+                class="w-full h-11 bg-background border border-border text-foreground rounded-lg px-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-muted-foreground/50"
+              />
+              @if (
+                patrimonioForm.get('valorAquisicao')?.touched &&
+                patrimonioForm.get('valorAquisicao')?.invalid
+              ) {
+                <span class="text-red-500 text-xs mt-1 block animate-in fade-in duration-200"
+                  >Campo obrigatório</span
+                >
+              }
+            </div>
+          </div>
+
+          <div
+            class="w-full animate-in fade-in slide-in-from-bottom-2 duration-400 delay-250"
+            style="animation-fill-mode: both"
+          >
+            <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+              N.º de Série <span class="text-muted-foreground/60 font-normal ml-1">(Opcional)</span>
+            </label>
+            <input
+              formControlName="numSerie"
+              type="text"
+              placeholder="Informe o número de série"
+              (input)="onInputChange($event, 'numSerie')"
+              class="w-full h-11 bg-background border border-border text-foreground rounded-lg px-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none disabled:bg-muted disabled:text-muted-foreground/50 disabled:cursor-not-allowed"
+            />
+            @if (patrimonioForm.get('quantidade')?.value > 1) {
+              <p
+                class="text-[10px] text-amber-500 mt-1 font-medium animate-in fade-in duration-200"
+              >
+                Desativado para múltiplas quantidades.
+              </p>
+            }
+            @if (patrimonioForm.get('numSerie')?.errors?.['pattern']) {
+              <span class="text-[10px] text-red-500 mt-1 animate-in fade-in duration-200"
+                >Use apenas letras, números, hifens (-) ou barras (/).</span
+              >
+            }
+          </div>
+
+          <div
+            class="w-full pt-2 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-300"
+            style="animation-fill-mode: both"
+          >
+            <label class="block text-sm font-medium text-foreground/80 mb-1.5">
+              Vincular Nota Fiscal
+              <span class="text-muted-foreground/60 font-normal ml-1">(Opcional)</span>
+            </label>
+            @if (ready()) {
+              <z-select
+                zPlaceholder="Selecione a nota fiscal"
+                class="bg-background border border-border"
+                formControlName="uuid_notaFiscalId"
+              >
+                <z-select-item [zValue]="''">Sem Nota</z-select-item>
+                @for (item of notasFiscais(); track item.uuid) {
+                  @if (item.status !== 'TOTALMENTE_VINCULADA') {
+                    <z-select-item [zValue]="item.uuid">
+                      {{ item.codigoNota }} - {{ item.fornecedor }}
+                    </z-select-item>
+                  }
+                }
+              </z-select>
+            } @else {
+              <div class="h-11 w-full bg-border rounded-lg animate-pulse"></div>
+            }
+            <p class="text-xs text-muted-foreground/60 mt-1">
+              Selecione uma nota fiscal já cadastrada no sistema.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex justify-end gap-3 mt-2 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[350ms]"
+      style="animation-fill-mode: both"
+    >
+      <button
+        type="button"
+        routerLink="/patrimonios"
+        class="px-6 py-2.5 bg-card border border-border text-foreground rounded-lg font-medium hover:bg-muted hover:-translate-y-0.5 active:scale-95 transition-all shadow-sm cursor-pointer"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="loading || patrimonioForm.invalid"
+        class="px-6 py-2.5 bg-brand-color text-white rounded-lg font-medium shadow-md hover:brightness-110 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:translate-y-0 focus:ring-2 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center gap-2"
+      >
+        @if (loading) {
+          <span
+            class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+          ></span>
+        }
+        {{ loading ? 'Salvando...' : 'Salvar patrimônio' }}
+      </button>
+    </div>
+  </div>
+</form>

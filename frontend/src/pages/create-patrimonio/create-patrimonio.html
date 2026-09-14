@@ -1,0 +1,254 @@
+<div class="flex-1 flex flex-col bg-background text-foreground transition-colors duration-300">
+  <main class="flex-1 py-6 md:px-5 md:py-8">
+    <div class="bg-card rounded-xl p-5 sm:p-8 max-w-6xl mx-auto shadow-sm border border-border">
+      <h1
+        class="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3 animate-in fade-in slide-in-from-top-3 duration-500"
+        style="animation-fill-mode: both"
+      >
+        Criar Patrimônios com Nota Fiscal
+      </h1>
+
+      <p
+        class="text-foreground/70 text-sm sm:text-base mb-6 max-w-4xl animate-in fade-in slide-in-from-top-3 duration-500 delay-75"
+        style="animation-fill-mode: both"
+      >
+        Envie uma Nota Fiscal em formato XML ou PDF para criar automaticamente registros de
+        patrimônios com base nos itens da nota. Formato aceito: <strong>XML</strong> ou
+        <strong>PDF</strong>, máximo <strong>10MB</strong>.
+      </p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+        <div
+          class="lg:col-span-2 rounded-xl p-6 lg:p-10 border-2 border-dashed flex flex-col items-center justify-center text-center min-h-[280px] lg:min-h-[420px] transition-all animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150"
+          style="animation-fill-mode: both"
+          [class]="
+            isDragging
+              ? 'bg-primary/10 border-primary ring-2 ring-primary/20'
+              : 'bg-muted/30 border-border hover:border-primary/50'
+          "
+          (dragenter)="onDragEnter($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+        >
+          <div
+            class="relative mb-4 text-foreground animate-in fade-in zoom-in-90 duration-500 delay-300"
+            style="animation-fill-mode: both"
+          >
+            <svg
+              class="w-13 h-16 sm:w-[54px] sm:h-[64px]"
+              viewBox="0 0 54 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 2H34.0001L50.0001 15.3333V62H2V2Z"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M34 2V15.3333H50"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M9.99976 32H33.9998"
+                stroke="#4D9476"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M9.99976 45.3333H25.9998"
+                stroke="#4D9476"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M39.9998 53.6665C46.6272 53.6665 51.9998 49.1894 51.9998 43.6665C51.9998 38.1437 46.6272 33.6665 39.9998 33.6665C33.3723 33.6665 27.9998 38.1437 27.9998 43.6665C27.9998 49.1894 33.3723 53.6665 39.9998 53.6665Z"
+                fill="#4B9475"
+                stroke="#4B9475"
+                stroke-width="4"
+              />
+              <path
+                d="M34.8 43.6666L38.8001 46.9999L45.2001 41.3333"
+                stroke="white"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
+          <h2
+            class="text-base sm:text-lg font-semibold mb-1 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-[350ms]"
+            style="animation-fill-mode: both"
+          >
+            Suba a Nota Fiscal (PDF ou XML)
+          </h2>
+
+          <p
+            class="font-medium text-foreground/50 mb-6 text-sm sm:text-base animate-in fade-in slide-in-from-bottom-2 duration-400 delay-[400ms]"
+            style="animation-fill-mode: both"
+          >
+            Ou arraste o arquivo para cá
+          </p>
+
+          <input
+            #fileInput
+            type="file"
+            accept=".xml,application/xml,text/xml,.pdf,application/pdf"
+            class="hidden"
+            (change)="onFileSelected($event)"
+          />
+
+          <button
+            type="button"
+            class="inline-block bg-brand-color hover:bg-brand-color/90 text-white px-8 sm:px-10 py-3 sm:py-3.5 rounded-md text-sm font-semibold cursor-pointer transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 animate-in fade-in zoom-in-95 duration-400 delay-[450ms]"
+            style="animation-fill-mode: both"
+            (click)="fileInput.click()"
+          >
+            Selecionar Arquivo
+          </button>
+
+          @if (selectedFile) {
+            <div
+              class="mt-6 w-full max-w-[520px] flex items-center justify-between gap-2 sm:gap-3 p-3 sm:px-4 sm:py-3 rounded-xl bg-muted/50 border border-border animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-300"
+              style="animation-fill-mode: both"
+            >
+              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div
+                  class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-background border border-border flex items-center justify-center shrink-0"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-foreground/70"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6" />
+                    <path d="M8 13h8" />
+                    <path d="M8 17h8" />
+                  </svg>
+                </div>
+                <div class="min-w-0 text-left">
+                  <p
+                    class="text-sm font-semibold text-foreground truncate max-w-[150px] sm:max-w-[260px]"
+                    [title]="selectedFile.name"
+                  >
+                    {{ selectedFile.name }}
+                  </p>
+                  <p class="text-xs text-foreground/60">
+                    {{ (selectedFile.size / 1024).toFixed(2) }} KB
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 sm:gap-3 shrink-0">
+                <button
+                  type="button"
+                  class="text-xs sm:text-sm font-semibold text-foreground/80 hover:text-foreground transition cursor-pointer"
+                  (click)="fileInput.click()"
+                >
+                  Trocar
+                </button>
+                <button
+                  type="button"
+                  class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg flex items-center justify-center text-destructive hover:bg-destructive/10 transition active:scale-95"
+                  (click)="removerArquivo()"
+                  title="Remover"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4h8v2" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          }
+
+          <p
+            class="text-xs text-foreground/40 mt-6 animate-in fade-in duration-500 delay-500"
+            style="animation-fill-mode: both"
+          >
+            Formato suportado: XML ou PDF | Tamanho máximo: 10MB
+          </p>
+        </div>
+
+        <div
+          class="bg-muted/50 rounded-xl p-6 sm:p-8 border border-border shadow-sm flex flex-col h-auto lg:min-h-[420px] animate-in fade-in slide-in-from-right-4 duration-500 delay-200"
+          style="animation-fill-mode: both"
+        >
+          <h3
+            class="text-base sm:text-lg font-semibold mb-4 sm:mb-6 animate-in fade-in slide-in-from-top-2 duration-400 delay-300"
+            style="animation-fill-mode: both"
+          >
+            Recomendações:
+          </h3>
+
+          <ul class="space-y-4 sm:space-y-6 text-foreground/80">
+            @for (rec of recomendacoes; track rec; let i = $index) {
+              <li
+                class="flex gap-2 sm:gap-3 items-start animate-in fade-in slide-in-from-right-2 duration-400"
+                [style]="'animation-delay: ' + (350 + i * 70) + 'ms; animation-fill-mode: both;'"
+              >
+                <img src="assets/check-icon.svg" class="h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5" />
+                <span class="text-xs sm:text-sm">{{ rec }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-8 lg:mt-10 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[500ms]"
+        style="animation-fill-mode: both"
+      >
+        <button
+          type="button"
+          class="w-full sm:w-auto px-6 py-3 rounded-xl bg-muted text-foreground hover:bg-muted/80 active:scale-95 transition-all font-medium cursor-pointer"
+          (click)="cancelar()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="w-full sm:w-auto px-8 py-3 rounded-xl bg-brand-color text-white font-semibold shadow-md cursor-pointer text-center transition-all hover:brightness-110 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
+          [disabled]="!podeEnviar()"
+          (click)="enviarNotaFiscal()"
+        >
+          @if (isUploading) {
+            <span
+              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+            ></span>
+            Enviando...
+          } @else {
+            Enviar Nota Fiscal
+          }
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

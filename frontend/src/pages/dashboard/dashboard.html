@@ -1,0 +1,535 @@
+<div class="px-4 py-5 sm:px-6 sm:py-8 bg-background min-h-screen text-foreground font-sans">
+  <!-- HEADER -->
+  <div
+    class="flex flex-col gap-4 mb-6 animate-in fade-in slide-in-from-top-3 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight leading-tight">
+          Dashboard Gerencial
+        </h1>
+        <p class="text-xs text-muted-foreground mt-0.5">Visão geral do patrimônio e indicadores</p>
+      </div>
+
+      <!-- Filtros de data: coluna no mobile, linha no desktop -->
+      <div class="flex flex-col sm:flex-row sm:items-end gap-2 flex-shrink-0">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+            >De</label
+          >
+          <div class="w-full sm:w-[155px]">
+            <z-date-picker
+              [formControl]="dataInicioFilter"
+              zFormat="dd/MM/yyyy"
+              placeholder="Data inicial"
+              zSize="default"
+              class="w-full block"
+            ></z-date-picker>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+            >Até</label
+          >
+          <div class="w-full sm:w-[155px]">
+            <z-date-picker
+              [formControl]="dataFimFilter"
+              zFormat="dd/MM/yyyy"
+              placeholder="Data final"
+              zSize="default"
+              class="w-full block"
+            ></z-date-picker>
+          </div>
+        </div>
+        @if (dataInicioFilter.value || dataFimFilter.value) {
+          <button
+            (click)="limparDatas()"
+            class="self-start sm:self-end h-11 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+          >
+            Limpar
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Barra de filtros ativos -->
+    @if (
+      activeStatusFilter() || localNomeAtivo() || dataInicioFilter.value || dataFimFilter.value
+    ) {
+      <div
+        class="flex flex-wrap items-center gap-2 p-3 bg-muted/40 border border-border rounded-xl animate-in fade-in slide-in-from-top-2 duration-300"
+        style="animation-fill-mode: both"
+      >
+        <span class="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5">
+          <lucide-angular [img]="FilterX" size="13"></lucide-angular> Filtros:
+        </span>
+
+        @if (activeStatusFilter()) {
+          <button
+            class="px-2.5 py-1 bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold rounded-full flex items-center gap-1.5 hover:bg-primary/20 transition-colors active:scale-95"
+            (click)="toggleStatusFilter(activeStatusFilter()!)"
+          >
+            {{ activeStatusFilter() }}
+            <lucide-angular [img]="X" size="10" class="opacity-60"></lucide-angular>
+          </button>
+        }
+
+        @if (localNomeAtivo()) {
+          <button
+            class="px-2.5 py-1 bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold rounded-full flex items-center gap-1.5 hover:bg-primary/20 transition-colors active:scale-95"
+            (click)="limparLocalFilter()"
+          >
+            <lucide-angular [img]="MapPin" size="10"></lucide-angular>
+            {{ localNomeAtivo() }}
+            <lucide-angular [img]="X" size="10" class="opacity-60"></lucide-angular>
+          </button>
+        }
+
+        @if (dataInicioFilter.value) {
+          <span
+            class="px-2.5 py-1 bg-muted border border-border text-muted-foreground text-[11px] font-semibold rounded-full"
+          >
+            De: {{ dataInicioFilter.value | date: 'dd/MM/yyyy' }}
+          </span>
+        }
+        @if (dataFimFilter.value) {
+          <span
+            class="px-2.5 py-1 bg-muted border border-border text-muted-foreground text-[11px] font-semibold rounded-full"
+          >
+            Até: {{ dataFimFilter.value | date: 'dd/MM/yyyy' }}
+          </span>
+        }
+
+        <button
+          (click)="limparFiltros()"
+          class="ml-auto text-[11px] text-muted-foreground hover:text-foreground underline decoration-dashed underline-offset-4 transition-colors"
+        >
+          Limpar tudo
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- CARDS (2 colunas mobile → 4 desktop) -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+    @for (card of summaryCards(); track card.label; let i = $index) {
+      <div
+        class="bg-card border rounded-xl p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] animate-in fade-in slide-in-from-bottom-3"
+        [class]="card.borderClass || 'border-border'"
+        [style]="
+          'animation-duration:450ms;animation-delay:' +
+          (150 + i * 60) +
+          'ms;animation-fill-mode:both'
+        "
+      >
+        <div class="flex justify-between items-start mb-3">
+          <p
+            class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wide leading-tight pr-2"
+          >
+            {{ card.label }}
+          </p>
+          <div class="p-1.5 rounded-lg flex-shrink-0" [class]="card.iconBg">
+            <lucide-angular [img]="card.icon" size="14" [class]="card.iconColor"></lucide-angular>
+          </div>
+        </div>
+        <h2 class="text-base sm:text-xl font-bold leading-tight break-words">{{ card.value }}</h2>
+        @if (card.sub) {
+          <p class="text-[10px] mt-1.5 flex items-center gap-1" [class]="card.subColor">
+            <lucide-angular *ngIf="card.subIcon" [img]="card.subIcon" size="10"></lucide-angular>
+            {{ card.sub }}
+          </p>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- GRÁFICOS (stack mobile → grid 3 cols desktop) -->
+  <div class="flex flex-col lg:grid lg:grid-cols-3 gap-4 mb-4">
+    <!-- Donut: distribuição por status -->
+    <div
+      class="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-sm flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300"
+      style="animation-fill-mode: both"
+    >
+      <h3 class="text-sm font-semibold mb-3">Distribuição por Status</h3>
+
+      @if (donutChartData().series.length > 0) {
+        <div class="flex justify-center">
+          <apx-chart
+            [series]="donutChartData().series"
+            [chart]="donutChartOptions.chart!"
+            [labels]="donutChartData().labels"
+            [colors]="donutChartData().colors"
+            [plotOptions]="donutChartOptions.plotOptions!"
+            [dataLabels]="donutChartOptions.dataLabels!"
+            [legend]="donutChartOptions.legend!"
+            [stroke]="donutChartOptions.stroke!"
+            [tooltip]="donutChartOptions.tooltip!"
+          ></apx-chart>
+        </div>
+
+        <!-- Legenda clicável derivada de donutChartData() — só mostra status com quantidade > 0 -->
+        <div class="mt-3 grid grid-cols-2 sm:grid-cols-1 gap-0.5">
+          @for (item of donutLegendItems(); track item.status) {
+            <button
+              class="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors active:scale-[0.98] w-full text-left"
+              [class.bg-muted]="activeStatusFilter() === item.status"
+              (click)="toggleStatusFilter(item.status)"
+            >
+              <span
+                class="flex items-center gap-2 text-muted-foreground uppercase text-[10px] font-medium"
+              >
+                <span
+                  class="w-2 h-2 rounded-full flex-shrink-0"
+                  [style.background-color]="item.color"
+                ></span>
+                <span
+                  [class.font-bold]="activeStatusFilter() === item.status"
+                  [class.text-foreground]="activeStatusFilter() === item.status"
+                >
+                  {{ item.status }}
+                </span>
+              </span>
+              <span class="font-bold text-foreground text-[11px] ml-2">{{ item.quantidade }}</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div
+          class="flex-1 flex items-center justify-center border-2 border-dashed border-border rounded-lg bg-background/50 min-h-[160px]"
+        >
+          <p class="text-muted-foreground text-sm">Sem dados</p>
+        </div>
+      }
+    </div>
+
+    <!-- Barras: locais por valor -->
+    <div
+      class="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-sm lg:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[350ms]"
+      style="animation-fill-mode: both"
+    >
+      <div class="flex flex-col gap-3 mb-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-semibold leading-tight">Valor Investido por Local</h3>
+            <p class="text-[10px] text-muted-foreground mt-0.5">
+              Clique em uma barra para filtrar o dashboard
+            </p>
+          </div>
+
+          @if (localNomeAtivo()) {
+            <div
+              class="flex items-center gap-1.5 px-2 py-1 bg-primary/10 border border-primary/20 rounded-full flex-shrink-0 max-w-[130px]"
+            >
+              <lucide-angular
+                [img]="MapPin"
+                size="10"
+                class="text-primary flex-shrink-0"
+              ></lucide-angular>
+              <span class="text-[10px] font-bold text-primary truncate">{{
+                localNomeAtivo()
+              }}</span>
+              <button
+                (click)="limparLocalFilter()"
+                class="text-primary/50 hover:text-primary flex-shrink-0 leading-none text-sm"
+              >
+                &times;
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Multi-select de locais -->
+        <div class="relative" (click)="$event.stopPropagation()">
+          <button
+            (click)="toggleDropdown($event)"
+            class="w-full sm:w-auto flex items-center gap-2 px-3 h-10 border border-border rounded-lg bg-background hover:bg-muted/40 transition-colors text-sm font-medium active:scale-[0.98]"
+          >
+            <lucide-angular
+              [img]="MapPin"
+              size="13"
+              class="text-muted-foreground flex-shrink-0"
+            ></lucide-angular>
+            <span class="flex-1 text-left text-sm">
+              @if (chartLocais().length === 0) {
+                <span class="text-muted-foreground">Selecionar locais…</span>
+              } @else {
+                <span
+                  >{{ chartLocais().length }} local{{ chartLocais().length !== 1 ? 'is' : '' }} no
+                  gráfico</span
+                >
+              }
+            </span>
+            <span class="hidden sm:flex items-center gap-1 overflow-hidden max-w-[200px]">
+              @for (nome of chartLocaisNomes().slice(0, 3); track nome) {
+                <span
+                  class="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded truncate max-w-[60px]"
+                  >{{ nome }}</span
+                >
+              }
+              @if (chartLocaisNomes().length > 3) {
+                <span class="text-[10px] text-muted-foreground"
+                  >+{{ chartLocaisNomes().length - 3 }}</span
+                >
+              }
+            </span>
+            <lucide-angular
+              [img]="ChevronDown"
+              size="14"
+              class="text-muted-foreground flex-shrink-0 transition-transform duration-200"
+              [style.transform]="isDropdownOpen() ? 'rotate(180deg)' : 'rotate(0deg)'"
+            ></lucide-angular>
+          </button>
+
+          @if (isDropdownOpen()) {
+            <div
+              class="absolute top-[calc(100%+6px)] left-0 right-0 sm:right-auto sm:min-w-[280px] bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+              style="animation-fill-mode: both"
+              (click)="$event.stopPropagation()"
+            >
+              <div
+                class="px-3 py-2.5 border-b border-border bg-muted/30 flex items-center justify-between"
+              >
+                <div>
+                  <p class="text-xs font-semibold text-foreground">Locais no gráfico</p>
+                  <p class="text-[10px] text-muted-foreground mt-0.5">
+                    {{ chartLocais().length }}/5 selecionados
+                  </p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button
+                    (click)="selecionarTop5()"
+                    class="text-[11px] font-semibold text-primary hover:underline"
+                  >
+                    Top 5 valor
+                  </button>
+                  <button
+                    (click)="limparChartLocais($event)"
+                    class="text-[11px] text-muted-foreground hover:text-foreground"
+                  >
+                    Limpar
+                  </button>
+                </div>
+              </div>
+
+              <div class="px-3 pt-2 pb-1">
+                <div class="h-1 w-full bg-border rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-primary rounded-full transition-all duration-300"
+                    [style.width]="(chartLocais().length / 5) * 100 + '%'"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="max-h-60 overflow-y-auto custom-scrollbar py-1">
+                @for (local of locais(); track local.uuid) {
+                  <button
+                    (click)="toggleChartLocal(local.uuid, $event)"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted/50 transition-colors text-left group"
+                    [class.opacity-40]="!isLocalInChart(local.uuid) && chartLocais().length >= 5"
+                    [disabled]="!isLocalInChart(local.uuid) && chartLocais().length >= 5"
+                  >
+                    <div
+                      class="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all duration-150"
+                      [class.bg-primary]="isLocalInChart(local.uuid)"
+                      [class.border-primary]="isLocalInChart(local.uuid)"
+                      [class.border-border]="!isLocalInChart(local.uuid)"
+                    >
+                      @if (isLocalInChart(local.uuid)) {
+                        <lucide-angular
+                          [img]="Check"
+                          size="10"
+                          class="text-primary-foreground"
+                        ></lucide-angular>
+                      }
+                    </div>
+                    <span class="flex-1 text-sm text-foreground truncate">{{ local.local }}</span>
+                    <span class="text-[10px] text-muted-foreground font-medium flex-shrink-0">
+                      {{ formatarMoedaResumida(getLocalValor(local.local)) }}
+                    </span>
+                  </button>
+                }
+
+                @if (locais().length === 0) {
+                  <p class="text-center text-sm text-muted-foreground py-4">
+                    Nenhum local encontrado
+                  </p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (barChartData().series[0].data.length > 0) {
+        <div class="w-full overflow-hidden">
+          <apx-chart
+            [series]="barChartData().series"
+            [chart]="barChartOptions.chart!"
+            [xaxis]="{
+              categories: barChartData().categories,
+              labels: barChartOptions.xaxis?.labels,
+            }"
+            [yaxis]="barChartOptions.yaxis!"
+            [colors]="barChartColors()"
+            [plotOptions]="barChartPlotOptions()"
+            [dataLabels]="barChartOptions.dataLabels!"
+            [grid]="barChartOptions.grid!"
+            [tooltip]="barChartOptions.tooltip!"
+          ></apx-chart>
+        </div>
+      } @else {
+        <div
+          class="h-44 flex items-center justify-center border-2 border-dashed border-border rounded-lg bg-background/50"
+        >
+          <p class="text-muted-foreground text-sm">Sem dados para exibir</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- DEVOLUÇÕES + MOVIMENTAÇÕES (stack mobile → grid 2 cols desktop) -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Devoluções Próximas -->
+    <div
+      class="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms]"
+      style="animation-fill-mode: both"
+    >
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold">Devoluções Próximas</h3>
+        @if (devolucoesProximas().length > 0) {
+          <span
+            class="text-[10px] font-bold px-2 py-0.5 bg-destructive/10 text-destructive rounded-full"
+          >
+            {{ devolucoesProximas().length }}
+          </span>
+        }
+      </div>
+
+      <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+        @if (ready()) {
+          @for (item of devolucoesProximas(); track $index; let i = $index) {
+            <div
+              class="flex items-center gap-3 p-3 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+              [style]="'animation-delay:' + (450 + i * 40) + 'ms;animation-fill-mode:both'"
+            >
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0"
+                [ngClass]="item.avatarClass"
+              >
+                {{ item.iniciais }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-foreground truncate">
+                  {{ item.patrimonioDesc }}
+                  <span class="text-muted-foreground font-normal">({{ item.patrimonioNum }})</span>
+                </p>
+                <p class="text-[10px] text-muted-foreground truncate">{{ item.nome }}</p>
+              </div>
+              <span
+                class="px-2 py-1 rounded-md text-[10px] font-bold flex-shrink-0 whitespace-nowrap"
+                [ngClass]="item.badgeClass"
+              >
+                {{ item.badgeText }}
+              </span>
+            </div>
+          } @empty {
+            <div
+              class="flex flex-col items-center justify-center py-10 border-2 border-dashed border-border rounded-lg bg-background/50"
+            >
+              <lucide-angular
+                [img]="CheckCircle"
+                size="26"
+                class="text-emerald-500 mb-2"
+              ></lucide-angular>
+              <p class="text-sm text-muted-foreground font-medium">Nenhuma devolução pendente</p>
+            </div>
+          }
+        } @else {
+          @for (_ of [1, 2, 3]; track $index) {
+            <div class="h-14 w-full bg-border/40 rounded-lg animate-pulse"></div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Últimas Movimentações -->
+    <div
+      class="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-sm flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[450ms]"
+      style="animation-fill-mode: both"
+    >
+      <h3 class="text-sm font-semibold mb-3">Últimas Movimentações</h3>
+      <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar flex-1">
+        @if (ready() && ultimasMovimentacoes().length > 0) {
+          @for (item of ultimasMovimentacoes(); track $index; let i = $index) {
+            <div
+              class="flex items-start gap-2.5 p-3 border border-border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+              [style]="'animation-delay:' + (480 + i * 40) + 'ms;animation-fill-mode:both'"
+            >
+              <div
+                class="flex-shrink-0 mt-0.5 p-1.5 rounded-full bg-background border border-border shadow-sm"
+              >
+                <lucide-angular
+                  [img]="getLogIcon(item.detalhesLog.acao).icon"
+                  size="13"
+                  [class]="getLogIcon(item.detalhesLog.acao).color"
+                ></lucide-angular>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 mb-0.5">
+                  <p class="text-[11px] font-semibold truncate uppercase">
+                    {{ item.detalhesLog.acao }} · {{ item.detalhesLog.detalhes.numeroPatrimonio }}
+                  </p>
+                  <span class="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
+                    {{ item.detalhesLog.dataHora | date: 'dd/MM HH:mm' }}
+                  </span>
+                </div>
+                <p class="text-[10px] text-muted-foreground line-clamp-2">
+                  {{ item.detalhesLog.descricao }}
+                </p>
+                <div class="flex items-center gap-1.5 mt-1.5">
+                  <div
+                    class="w-3.5 h-3.5 rounded-full bg-primary/10 flex items-center justify-center text-[8px] font-bold text-primary flex-shrink-0"
+                  >
+                    {{ item.detalhesLog.autor?.nome?.charAt(0) || 'S' }}
+                  </div>
+                  <span class="text-[10px] text-muted-foreground truncate">
+                    {{ item.detalhesLog.autor?.nome || 'Sistema' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        } @else if (ready()) {
+          <div
+            class="flex flex-col items-center justify-center py-10 border-2 border-dashed border-border rounded-lg bg-background/50"
+          >
+            <lucide-angular
+              [img]="Activity"
+              size="26"
+              class="text-muted-foreground mb-2"
+            ></lucide-angular>
+            <p class="text-sm text-muted-foreground">Sem movimentações recentes</p>
+          </div>
+        } @else {
+          @for (_ of [1, 2, 3]; track $index) {
+            <div class="h-14 w-full bg-border/40 rounded-lg animate-pulse"></div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.4);
+    border-radius: 10px;
+  }
+</style>

@@ -1,0 +1,115 @@
+<div class="min-h-screen bg-background p-6 font-sans text-foreground transition-colors duration-300">
+  <div class="max-w-2xl mx-auto">
+
+    <header
+      class="flex items-center justify-between mb-8 pb-4 border-b border-border animate-in fade-in slide-in-from-top-3 duration-500"
+      style="animation-fill-mode: both">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold shadow-sm">
+          W
+        </div>
+        <div>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-foreground">WebAcademy</h2>
+          <p class="text-xs text-muted-foreground font-medium">Gestão Patrimonial</p>
+        </div>
+      </div>
+    </header>
+
+    @if (isLoading()) {
+    <div class="flex flex-col gap-4 animate-in fade-in duration-500">
+      <div class="h-8 w-48 bg-muted rounded-md animate-pulse"></div>
+      <div class="h-4 w-full bg-muted rounded-sm animate-pulse"></div>
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div class="h-16 bg-muted rounded-lg animate-pulse"></div>
+        <div class="h-16 bg-muted rounded-lg animate-pulse"></div>
+      </div>
+    </div>
+    }
+
+    @if (!isLoading() && hasError()) {
+    <div
+      class="text-center py-12 bg-card rounded-xl border border-destructive/20 transition-colors duration-300 animate-in zoom-in-95 duration-500">
+      <div class="text-destructive mb-3 flex justify-center">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-foreground mb-2">Patrimônio não encontrado</h2>
+      <p class="text-muted-foreground">Este item não existe ou o link pode estar desatualizado.</p>
+    </div>
+    }
+
+    @if (!isLoading() && !hasError() && patrimonio()) {
+    <main
+      class="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden transition-colors duration-300 animate-in fade-in slide-in-from-top-4 duration-500 delay-100"
+      style="animation-fill-mode: both">
+
+      <div class="p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-foreground tracking-tight">
+            {{ patrimonio().numPatrimonio }}
+          </h1>
+          <p class="text-lg text-muted-foreground font-medium mt-1 leading-snug">
+            {{ patrimonio().descricao }}
+          </p>
+        </div>
+        <span
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide border transition-colors"
+          [ngClass]="getStatusClasses(patrimonio().estado)">
+          <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+          {{ patrimonio().estado }}
+        </span>
+      </div>
+
+      <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Categoria
+          </span>
+          <p class="text-foreground font-medium">
+            {{ patrimonio().categoria || '—' }}
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Localização
+          </span>
+          <p class="text-foreground font-medium">
+            {{ patrimonio().localizacao || '—' }}
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Número de Série
+          </span>
+          <p class="text-foreground font-medium font-mono">
+            {{ patrimonio().numeroSerie || 'N/A' }}
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Data de Aquisição
+          </span>
+          <p class="text-foreground font-medium">
+            {{ formatarData(patrimonio().dataAquisicao) }}
+          </p>
+        </div>
+
+      </div>
+
+    </main>
+
+    <p class="text-center text-xs text-muted-foreground mt-6 animate-in fade-in duration-500 delay-200"
+      style="animation-fill-mode: both">
+      Informações de uso interno. Em caso de dúvidas, contate o setor responsável.
+    </p>
+    }
+  </div>
+</div>

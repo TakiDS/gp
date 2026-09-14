@@ -1,0 +1,420 @@
+<div class="min-h-screen bg-background p-4 md:p-6 font-sans text-foreground">
+  <div
+    class="mb-6 animate-in fade-in slide-in-from-top-3 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <z-breadcrumb zWrap="wrap" zAlign="start">
+      <a
+        [routerLink]="['/patrimonios']"
+        class="flex items-center gap-2 text-inherit cursor-pointer"
+      >
+        <z-breadcrumb-item>
+          <lucide-angular [img]="House" size="17" strokeWidth="2"></lucide-angular>
+          Home
+        </z-breadcrumb-item>
+      </a>
+      <a
+        [routerLink]="['/list-comodatos']"
+        class="flex items-center gap-2 text-inherit cursor-pointer"
+      >
+        <z-breadcrumb-item>Comodatos</z-breadcrumb-item>
+      </a>
+      <z-breadcrumb-item>Detalhes do Empréstimo</z-breadcrumb-item>
+    </z-breadcrumb>
+  </div>
+
+  @if (isLoading()) {
+    <div class="animate-in fade-in duration-500" style="animation-fill-mode: both">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="h-7 w-56 bg-muted rounded-lg animate-pulse"></div>
+        <div class="h-6 w-20 bg-muted rounded-full animate-pulse"></div>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <div class="bg-card p-4 rounded-xl border border-border flex items-center gap-3">
+            <div class="w-10 h-10 bg-muted rounded-lg animate-pulse shrink-0"></div>
+            <div class="flex flex-col gap-2 flex-1">
+              <div class="h-3 w-14 bg-muted rounded animate-pulse"></div>
+              <div class="h-4 w-20 bg-muted rounded animate-pulse"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        <div class="bg-card rounded-xl border border-border overflow-hidden">
+          <div class="p-6 border-b border-border flex flex-col gap-2">
+            <div class="h-5 w-48 bg-muted rounded animate-pulse"></div>
+            <div class="h-4 w-72 bg-muted rounded animate-pulse"></div>
+          </div>
+          <div class="p-4 flex flex-col gap-3">
+            @for (i of [1, 2, 3]; track i) {
+              <div class="h-16 w-full bg-muted/50 rounded-xl animate-pulse"></div>
+            }
+          </div>
+        </div>
+        <div class="bg-card rounded-xl border border-border p-6 flex flex-col gap-4">
+          <div class="h-4 w-24 bg-muted rounded animate-pulse"></div>
+          <div class="h-12 w-12 bg-muted rounded-full animate-pulse mx-auto"></div>
+          <div class="h-5 w-36 bg-muted rounded animate-pulse mx-auto"></div>
+          <div class="h-4 w-48 bg-muted rounded animate-pulse mx-auto"></div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6 animate-in fade-in slide-in-from-top-3 duration-500 delay-75"
+      style="animation-fill-mode: both"
+    >
+      <h1 class="text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
+        <lucide-angular [img]="Handshake" size="22" class="text-blue-600 shrink-0"></lucide-angular>
+        <span
+          >Comodato:
+          <span class="font-mono text-lg">#{{ comodato()?.uuid?.substring(0, 8) }}</span></span
+        >
+      </h1>
+      <span
+        [class]="getStatusBadgeClass(comodato()?.dataFim ? 'FINALIZADO' : comodato()?.estado)"
+        class="shrink-0 w-fit"
+      >
+        <span class="relative flex h-2 w-2 mr-2">
+          @if (comodato()?.estado === 'ATRASADO' && !comodato()?.dataFim) {
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"
+            ></span>
+          }
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+        </span>
+        {{
+          comodato()?.dataFim
+            ? 'DEVOLVIDO'
+            : comodato()?.estado === 'PENDENTE'
+              ? 'EM POSSE'
+              : comodato()?.estado
+        }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+      <div
+        class="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center justify-between col-span-2 sm:col-span-1 animate-in fade-in slide-in-from-bottom-3"
+        style="animation-duration: 450ms; animation-delay: 100ms; animation-fill-mode: both"
+      >
+        <div>
+          <p class="text-xs font-medium text-muted-foreground uppercase mb-1">Termo</p>
+          @if (comodato()?.validacaoTermo) {
+            <span class="text-sm font-semibold text-green-500">Assinado</span>
+          } @else {
+            <span class="text-sm font-semibold text-amber-500">Pendente</span>
+          }
+        </div>
+        <lucide-angular
+          [img]="comodato()?.validacaoTermo ? CheckCircle : Clock"
+          size="22"
+          class="text-muted-foreground/30 shrink-0"
+        ></lucide-angular>
+      </div>
+
+      <div
+        class="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3"
+        style="animation-duration: 450ms; animation-delay: 160ms; animation-fill-mode: both"
+      >
+        <div class="p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-600 shrink-0">
+          <lucide-angular [img]="Calendar" size="18"></lucide-angular>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-muted-foreground uppercase mb-1">Início</p>
+          <p class="text-sm font-semibold truncate">{{ formatDate(comodato()?.dataInicio!) }}</p>
+        </div>
+      </div>
+
+      <div
+        class="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3"
+        [class.border-green-500/50]="comodato()?.dataFim"
+        [class.bg-green-500/5]="comodato()?.dataFim"
+        style="animation-duration: 450ms; animation-delay: 220ms; animation-fill-mode: both"
+      >
+        @if (comodato()?.dataFim) {
+          <div
+            class="p-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-600 shrink-0"
+          >
+            <lucide-angular [img]="CheckCircle" size="18"></lucide-angular>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-medium text-green-600 uppercase mb-1">Devolvido em</p>
+            <p class="text-sm font-bold text-green-700 truncate">
+              {{ formatDate(comodato()?.dataFim!) }}
+            </p>
+          </div>
+        } @else {
+          <div
+            class="p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-600 shrink-0"
+          >
+            <lucide-angular [img]="CalendarClock" size="18"></lucide-angular>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-medium text-muted-foreground uppercase mb-1">Previsão</p>
+            <p class="text-sm font-semibold truncate">
+              {{ formatDate(comodato()?.dataFimEsperado!) }}
+            </p>
+          </div>
+        }
+      </div>
+
+      <div
+        class="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3"
+        style="animation-duration: 450ms; animation-delay: 280ms; animation-fill-mode: both"
+      >
+        <div
+          class="p-2 bg-purple-500/10 border border-purple-500/20 rounded-lg text-purple-600 shrink-0"
+        >
+          <lucide-angular [img]="Package" size="18"></lucide-angular>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-muted-foreground uppercase mb-1">Itens</p>
+          <p class="text-sm font-bold">{{ comodato()?.patrimonio?.length || 0 }} Item(ns)</p>
+        </div>
+      </div>
+
+      <div
+        class="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3"
+        style="animation-duration: 450ms; animation-delay: 340ms; animation-fill-mode: both"
+      >
+        <div
+          class="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 shrink-0"
+        >
+          <lucide-angular [img]="FileText" size="18"></lucide-angular>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-muted-foreground uppercase mb-1">Termo PDF</p>
+          @if (comodato()?.termoUrl) {
+            <a
+              [href]="comodato()?.termoUrl"
+              target="_blank"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+            >
+              <lucide-angular [img]="FileDown" size="14"></lucide-angular>
+              Baixar PDF
+            </a>
+          } @else {
+            <span class="text-sm font-semibold text-muted-foreground">Indisponível</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[380ms]"
+      style="animation-fill-mode: both"
+    >
+      <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+        <div class="p-5 sm:p-6 border-b border-border">
+          <h2 class="text-base sm:text-lg font-semibold text-foreground">
+            Itens em Posse do Titular
+          </h2>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            Lista de equipamentos vinculados a este termo de comodato.
+          </p>
+        </div>
+
+        <table class="w-full text-left block md:table border-collapse">
+          <thead
+            class="hidden md:table-header-group bg-muted/30 text-muted-foreground border-b border-border"
+          >
+            <tr>
+              <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider">
+                Identificação
+              </th>
+              <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Descrição</th>
+              <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Nº Série</th>
+              <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center">
+                Ações
+              </th>
+            </tr>
+          </thead>
+
+          <tbody
+            class="block md:table-row-group divide-y-0 md:divide-y divide-border space-y-3 md:space-y-0 p-4 md:p-0"
+          >
+            @for (p of comodato()?.patrimonio; track p.uuid; let idx = $index) {
+              <tr
+                class="flex flex-col md:table-row bg-background md:bg-transparent rounded-xl border border-border md:border-0 md:border-b md:border-border/50 p-4 md:p-0 hover:bg-muted/20 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-400"
+                [style]="'animation-delay: ' + (420 + idx * 50) + 'ms; animation-fill-mode: both;'"
+              >
+                <td
+                  class="flex justify-between items-center md:table-cell md:px-6 md:py-4 border-b border-border/30 md:border-0 pb-2 mb-2 md:pb-0 md:mb-0"
+                >
+                  <span
+                    class="md:hidden text-[10px] font-black uppercase text-muted-foreground tracking-wider"
+                    >Identificação</span
+                  >
+                  <div class="flex flex-col text-right md:text-left">
+                    <span class="font-bold text-foreground">{{ p.numPatrimonio }}</span>
+                    <span class="text-[10px] uppercase text-muted-foreground font-medium"
+                      >Tag Ativo</span
+                    >
+                  </div>
+                </td>
+
+                <td
+                  class="flex justify-between items-center md:table-cell md:px-6 md:py-4 border-b border-border/30 md:border-0 pb-2 mb-2 md:pb-0 md:mb-0"
+                >
+                  <span
+                    class="md:hidden text-[10px] font-black uppercase text-muted-foreground tracking-wider shrink-0 mr-3"
+                    >Descrição</span
+                  >
+                  <span
+                    class="text-sm font-medium text-foreground text-right md:text-left line-clamp-2"
+                    >{{ p.descricao }}</span
+                  >
+                </td>
+
+                <td
+                  class="flex justify-between items-center md:table-cell md:px-6 md:py-4 border-b border-border/30 md:border-0 pb-2 mb-2 md:pb-0 md:mb-0"
+                >
+                  <span
+                    class="md:hidden text-[10px] font-black uppercase text-muted-foreground tracking-wider"
+                    >Nº Série</span
+                  >
+                  <span class="text-sm text-muted-foreground font-mono">{{
+                    p.numSerie || 'N/A'
+                  }}</span>
+                </td>
+
+                <td
+                  class="flex justify-between items-center md:table-cell md:px-6 md:py-4 border-b border-border/30 md:border-0 pb-2 mb-3 md:pb-0 md:mb-0"
+                >
+                  <span
+                    class="md:hidden text-[10px] font-black uppercase text-muted-foreground tracking-wider"
+                    >Status</span
+                  >
+                  <span [class]="getStatusBadgeClass(p.estadoFinalComodato)">{{
+                    p.estadoFinalComodato
+                  }}</span>
+                </td>
+
+                <td class="flex md:table-cell md:px-6 md:py-4 md:text-center">
+                  <button
+                    [routerLink]="['/detail-patrimonio', p.uuid]"
+                    class="w-full md:w-auto h-9 px-4 rounded-lg bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/80 hover:text-foreground hover:-translate-y-0.5 active:scale-95 transition-all"
+                  >
+                    Ver Equipamento
+                  </button>
+                </td>
+              </tr>
+            }
+
+            @if (!comodato()?.patrimonio?.length) {
+              <tr
+                class="block md:table-row animate-in fade-in zoom-in-95 duration-500 delay-[450ms]"
+                style="animation-fill-mode: both"
+              >
+                <td colspan="5" class="block md:table-cell">
+                  <div
+                    class="flex flex-col items-center justify-center py-16 text-center text-muted-foreground"
+                  >
+                    <div
+                      class="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-3 animate-in zoom-in-75 duration-500 delay-[500ms]"
+                      style="animation-fill-mode: both"
+                    >
+                      <lucide-angular [img]="Package" size="22" class="opacity-30"></lucide-angular>
+                    </div>
+                    <p class="font-medium">Nenhum item vinculado a este comodato.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <div
+          class="bg-card rounded-xl shadow-sm border border-border p-6 animate-in fade-in slide-in-from-right-4 duration-500 delay-[420ms]"
+          style="animation-fill-mode: both"
+        >
+          <h3 class="text-xs font-black uppercase tracking-widest text-muted-foreground mb-5">
+            Titular do Comodato
+          </h3>
+
+          <div class="flex flex-col items-center text-center gap-3 mb-5">
+            <div
+              class="w-14 h-14 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-xl font-bold text-primary"
+            >
+              {{ comodato()?.titular?.nome?.charAt(0)?.toUpperCase() || '?' }}
+            </div>
+            <div>
+              <p class="font-bold text-foreground text-sm">
+                {{ comodato()?.titular?.nome || '—' }}
+              </p>
+              <p
+                class="text-xs text-muted-foreground mt-0.5 flex items-center justify-center gap-1"
+              >
+                <lucide-angular [img]="Mail" size="11"></lucide-angular>
+                {{ comodato()?.titular?.email || '—' }}
+              </p>
+            </div>
+            @if (comodato()?.titular?.tipoPerfil) {
+              <span
+                class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide"
+              >
+                {{ comodato()?.titular?.tipoPerfil }}
+              </span>
+            }
+          </div>
+
+          <div class="w-full h-px bg-border mb-4"></div>
+
+          <div class="flex flex-col gap-3 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-muted-foreground font-medium">Status</span>
+              <span
+                [class]="
+                  getStatusBadgeClass(comodato()?.dataFim ? 'FINALIZADO' : comodato()?.estado)
+                "
+              >
+                {{
+                  comodato()?.dataFim
+                    ? 'DEVOLVIDO'
+                    : comodato()?.estado === 'PENDENTE'
+                      ? 'EM POSSE'
+                      : comodato()?.estado
+                }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-muted-foreground font-medium">Itens sob guarda</span>
+              <span class="text-sm font-bold text-foreground">{{
+                comodato()?.patrimonio?.length || 0
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-muted-foreground font-medium">Termo assinado</span>
+              @if (comodato()?.validacaoTermo) {
+                <span class="text-xs font-semibold text-green-500 flex items-center gap-1">
+                  <lucide-angular [img]="CheckCircle" size="12"></lucide-angular> Sim
+                </span>
+              } @else {
+                <span class="text-xs font-semibold text-amber-500 flex items-center gap-1">
+                  <lucide-angular [img]="Clock" size="12"></lucide-angular> Pendente
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (comodato()?.termoUrl) {
+          <a
+            [href]="comodato()?.termoUrl"
+            target="_blank"
+            class="flex items-center justify-center gap-2 h-11 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted hover:-translate-y-0.5 active:scale-95 transition-all shadow-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-[470ms]"
+            style="animation-fill-mode: both"
+          >
+            <lucide-angular [img]="FileDown" size="16" class="text-emerald-500"></lucide-angular>
+            Baixar Termo de Comodato
+          </a>
+        }
+      </div>
+    </div>
+  }
+</div>

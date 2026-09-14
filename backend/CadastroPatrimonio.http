@@ -1,0 +1,12 @@
+POST http://localhost:8080/patrimonio-especifico/cadastrar
+Content-Type: application/json
+
+{
+  "numSerie": "SN123456",
+  "estado": "GUARDADO",
+  "local": "3945ffaa-c8cc-4ec1-8c45-897a55b7b1f1",
+  
+}
+
+
+

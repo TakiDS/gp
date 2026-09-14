@@ -1,0 +1,459 @@
+<div class="bg-background min-h-full text-foreground transition-colors duration-300 p-0 md:p-4">
+  <z-breadcrumb
+    zWrap="wrap"
+    zAlign="start"
+    class="mb-6 animate-in fade-in slide-in-from-top-3 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <z-breadcrumb-item class="text-muted-foreground hover:text-primary">
+      <lucide-angular
+        [img]="House"
+        size="17"
+        strokeWidth="2"
+        class="my-icon rounded-md"
+      ></lucide-angular>
+      Home
+    </z-breadcrumb-item>
+    <z-breadcrumb-item class="text-muted-foreground hover:text-primary"
+      >Categorias</z-breadcrumb-item
+    >
+    <z-breadcrumb-item class="text-foreground font-medium"
+      >Patrimônios da Categoria</z-breadcrumb-item
+    >
+  </z-breadcrumb>
+
+  <div
+    class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 animate-in fade-in slide-in-from-top-3 duration-500 delay-75"
+    style="animation-fill-mode: both"
+  >
+    <div class="min-w-0 flex-1">
+      <h1 class="text-2xl md:text-3xl font-bold text-foreground break-words leading-tight">
+        @if (loadingCategory()) {
+          <span class="animate-pulse bg-muted h-8 w-48 block rounded"></span>
+        } @else {
+          {{ category()?.nome || 'Categoria não encontrada' }}
+        }
+      </h1>
+      <p class="text-sm text-muted-foreground mt-1 break-words max-w-2xl">
+        {{ category()?.descricao }}
+      </p>
+    </div>
+
+    <div
+      class="flex items-center gap-2 sm:gap-3 shrink-0 animate-in fade-in slide-in-from-top-2 duration-400 delay-150"
+      style="animation-fill-mode: both"
+    >
+      @if (category()?.totalPatrimonio === 0) {
+        <div class="flex-1 sm:flex-none">
+          <app-delete-category-button
+            [categoryData]="{ uuid: category()!.uuid, nome: category()!.nome }"
+            (categoryDeleted)="onCategoryDeleted()"
+            class="w-full"
+          ></app-delete-category-button>
+        </div>
+      }
+      <div class="flex-1 sm:flex-none">
+        <app-edit-categoria-button
+          [uuid]="category()!.uuid"
+          [currentName]="category()!.nome"
+          [currentDescription]="category()!.descricao"
+          (onCategoryUpdated)="onCategoryUpdated($event)"
+          class="w-full"
+        ></app-edit-categoria-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-6">
+    <div class="flex flex-col col-span-12 lg:col-span-9 gap-4">
+      <div
+        class="bg-background rounded-xl shadow-sm border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100"
+        style="animation-fill-mode: both"
+      >
+        <div class="p-6 border-b border-border/50">
+          <h2
+            class="font-semibold text-lg flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-left-2 duration-400 delay-150"
+            style="animation-fill-mode: both"
+          >
+            <lucide-angular [img]="Tag" size="20" class="text-primary"></lucide-angular>
+            Patrimônios nesta Categoria
+          </h2>
+
+          <div
+            class="relative animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+            style="animation-fill-mode: both"
+          >
+            <div
+              class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10"
+            >
+              <svg
+                class="h-4.5 w-4.5 text-muted-foreground/60"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </div>
+            <input
+              z-input
+              type="text"
+              class="w-full h-11 pl-10 pr-4 rounded-lg border border-border bg-muted/30 text-sm text-foreground placeholder-muted-foreground/60 focus:ring-2 focus:ring-primary/20 focus:bg-card transition-all outline-none"
+              placeholder="Buscar por descrição, número ou NF..."
+              [value]="searchTerm()"
+              (input)="onSearchChange($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left block md:table border-collapse">
+            <thead
+              class="hidden md:table-header-group bg-muted/50 text-muted-foreground border-b border-border/50"
+            >
+              <tr>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider">
+                  Identificação
+                </th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider">
+                  Item & Aquisição
+                </th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider">
+                  Localização
+                </th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider">Estado</th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider text-right">
+                  Valor
+                </th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider text-center">
+                  Nota Fiscal
+                </th>
+                <th class="px-4 py-4 text-xs font-semibold uppercase tracking-wider text-center">
+                  Detalhes
+                </th>
+              </tr>
+            </thead>
+
+            <tbody
+              class="block md:table-row-group divide-y-0 md:divide-y divide-border/50 space-y-4 md:space-y-0 bg-transparent p-4 md:p-0"
+            >
+              @if (loadingCategory()) {
+                @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+                  <tr
+                    class="flex flex-col md:table-row bg-card md:bg-transparent rounded-xl md:rounded-none border border-border md:border-b md:border-x-0 md:border-t-0 md:border-border/50 p-4 md:p-0 animate-in fade-in slide-in-from-bottom-2 duration-400"
+                    [style]="'animation-delay: ' + i * 60 + 'ms; animation-fill-mode: both;'"
+                  >
+                    <td class="px-4 py-3 md:py-4 md:table-cell">
+                      <z-skeleton class="h-4 w-24 rounded"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 md:table-cell">
+                      <z-skeleton class="h-4 w-full max-w-[200px] rounded"></z-skeleton
+                      ><z-skeleton class="h-3 w-20 rounded mt-1"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 md:table-cell">
+                      <z-skeleton class="h-6 w-28 rounded-md"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 md:table-cell">
+                      <z-skeleton class="h-6 w-20 rounded-md"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 md:table-cell md:text-right">
+                      <z-skeleton class="h-4 w-20 rounded md:ml-auto"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 md:table-cell md:text-center">
+                      <z-skeleton class="h-6 w-24 rounded-md md:mx-auto"></z-skeleton>
+                    </td>
+                    <td class="px-4 py-4 md:table-cell md:text-center">
+                      <z-skeleton class="h-9 w-full md:w-20 rounded-md md:mx-auto"></z-skeleton>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                @for (item of paginatedPatrimonios(); track item.uuid; let idx = $index) {
+                  <tr
+                    class="flex flex-col md:table-row bg-card md:bg-transparent rounded-xl md:rounded-none border border-border md:border-b md:border-x-0 md:border-t-0 md:border-border/50 hover:bg-muted/30 transition-colors group overflow-hidden shadow-sm md:shadow-none animate-in fade-in slide-in-from-bottom-2"
+                    [style]="
+                      'animation-duration: 400ms; animation-delay: ' +
+                      idx * 40 +
+                      'ms; animation-fill-mode: both;'
+                    "
+                  >
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex justify-between items-center md:table-cell border-b border-border/30 md:border-0"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0 mr-2"
+                        >Identificação</span
+                      >
+                      <div class="flex flex-col text-right md:text-left min-w-0">
+                        <span class="font-bold text-foreground truncate">{{
+                          item.numPatrimonio
+                        }}</span>
+                        <span
+                          class="text-xs text-muted-foreground flex items-center justify-end md:justify-start gap-1 mt-0.5 truncate"
+                        >
+                          Série: {{ item.numSerie || 'N/A' }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex flex-col justify-between items-center md:table-cell border-b border-border/30 md:border-0 md:max-w-[300px]"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0 mr-4"
+                        >Item & Aquisição</span
+                      >
+                      <div
+                        class="flex flex-col text-center items-end md:items-start md:text-left min-w-0"
+                      >
+                        <span
+                          class="text-sm font-medium text-foreground line-clamp-2 break-words"
+                          [title]="item.patrimonioGeral.descricao"
+                        >
+                          {{ item.patrimonioGeral.descricao }}
+                        </span>
+                        @if (item.patrimonioGeral.dataAquisicao) {
+                          <span
+                            class="text-xs text-muted-foreground flex items-center justify-end md:justify-start gap-1 mt-1 shrink-0"
+                          >
+                            <lucide-angular [img]="CalendarDays" size="12"></lucide-angular>
+                            {{ item.patrimonioGeral.dataAquisicao | date: 'dd/MM/yyyy' }}
+                          </span>
+                        }
+                      </div>
+                    </td>
+
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center md:table-cell border-b border-border/30 md:border-0"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0 mr-4"
+                        >Localização</span
+                      >
+                      <div class="flex justify-end md:justify-start min-w-0">
+                        <span
+                          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-foreground border border-border/50 max-w-full"
+                        >
+                          <lucide-angular
+                            [img]="MapPin"
+                            size="12"
+                            class="text-muted-foreground shrink-0"
+                          ></lucide-angular>
+                          <span class="truncate" [title]="item.localizacao?.local">{{
+                            item.localizacao?.local || 'Sem localização'
+                          }}</span>
+                        </span>
+                      </div>
+                    </td>
+
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex justify-between items-center md:table-cell border-b border-border/30 md:border-0"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0"
+                        >Estado</span
+                      >
+                      <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0"
+                        [ngClass]="getStatusClass(item.estado)"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                        {{ item.estado }}
+                      </span>
+                    </td>
+
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex justify-between items-center md:table-cell border-b border-border/30 md:border-0 md:text-right"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0"
+                        >Valor</span
+                      >
+                      <span class="font-semibold text-foreground whitespace-nowrap">{{
+                        item.patrimonioGeral.valorAquisicao | currency: 'BRL'
+                      }}</span>
+                    </td>
+
+                    <td
+                      class="px-4 py-3 md:px-4 md:py-4 flex justify-between items-center md:table-cell border-b border-border/30 md:border-0 md:text-center"
+                    >
+                      <span
+                        class="md:hidden text-xs font-semibold text-muted-foreground uppercase shrink-0"
+                        >Nota Fiscal</span
+                      >
+                      @if (item.patrimonioGeral.notaFiscal?.codigoNota) {
+                        <span
+                          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/10 text-blue-600 border border-blue-500/20 truncate max-w-[120px]"
+                        >
+                          <lucide-angular
+                            [img]="Receipt"
+                            size="12"
+                            class="shrink-0"
+                          ></lucide-angular>
+                          {{ item.patrimonioGeral.notaFiscal?.codigoNota }}
+                        </span>
+                      } @else {
+                        <span class="text-xs text-muted-foreground italic">Sem Nota</span>
+                      }
+                    </td>
+
+                    <td
+                      class="px-4 py-4 md:px-4 md:py-4 flex md:table-cell bg-muted/10 md:bg-transparent mt-2 md:mt-0 md:text-center"
+                    >
+                      <div class="flex items-center justify-center w-full">
+                        <button
+                          [routerLink]="['/detail-patrimonio', item.uuid]"
+                          class="w-full md:w-auto px-4 py-1.5 h-10 md:h-auto text-xs font-medium rounded-md transition-all text-white bg-brand-color hover:bg-brand-color/80 hover:shadow-md hover:-translate-y-0.5 active:scale-95 shadow-sm"
+                        >
+                          Detalhes
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+
+                @if (!loadingCategory() && patrimonios().length === 0) {
+                  <tr
+                    class="block md:table-row animate-in fade-in zoom-in-95 duration-500"
+                    style="animation-fill-mode: both"
+                  >
+                    <td colspan="7" class="block md:table-cell">
+                      <div
+                        class="flex flex-col items-center justify-center py-20 px-4 text-center text-muted-foreground"
+                      >
+                        <div
+                          class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-3 mx-auto animate-in zoom-in-75 duration-500 delay-100"
+                          style="animation-fill-mode: both"
+                        >
+                          <lucide-angular
+                            [img]="Tag"
+                            size="24"
+                            class="opacity-30 text-primary"
+                          ></lucide-angular>
+                        </div>
+                        <h3
+                          class="text-base font-semibold text-foreground animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+                          style="animation-fill-mode: both"
+                        >
+                          Nenhum patrimônio encontrado
+                        </h3>
+                        <p
+                          class="text-sm mt-1 max-w-xs mx-auto animate-in fade-in slide-in-from-bottom-2 duration-400 delay-300"
+                          style="animation-fill-mode: both"
+                        >
+                          Esta categoria ainda não possui itens cadastrados no sistema.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (patrimonios().length > 0 || totalPages() > 1) {
+          <div
+            class="p-4 border-t border-border animate-in fade-in slide-in-from-bottom-2 duration-400 delay-[400ms]"
+            style="animation-fill-mode: both"
+          >
+            <zard-pagination-custom
+              [paginaAtual]="currentPage()"
+              [totalPaginas]="totalPages()"
+              (paginaChange)="onPageChange($event)"
+            />
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-3 space-y-6">
+      <div
+        class="bg-card rounded-xl p-6 shadow-sm border border-border transition-colors relative overflow-hidden animate-in fade-in slide-in-from-right-4 duration-500 delay-150"
+        style="animation-fill-mode: both"
+      >
+        <p class="text-sm font-medium text-muted-foreground">Valor Total da Categoria</p>
+        <div class="flex items-baseline gap-2 mt-2">
+          @if (loadingCategory()) {
+            <span class="animate-pulse bg-muted h-9 w-32 block rounded mt-1"></span>
+          } @else {
+            <p class="text-3xl font-bold text-foreground">
+              {{ valorTotalCategoria() | currency: 'BRL' }}
+            </p>
+          }
+        </div>
+        <div class="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+          <span class="text-xs text-muted-foreground font-medium">Total de Itens</span>
+          <span class="text-sm font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">{{
+            category()?.totalPatrimonio || 0
+          }}</span>
+        </div>
+      </div>
+
+      <div
+        class="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col items-center transition-colors animate-in fade-in slide-in-from-right-4 duration-500 delay-250"
+        style="animation-fill-mode: both"
+      >
+        <h3
+          class="text-sm font-semibold text-muted-foreground uppercase tracking-wider w-full mb-4 text-left"
+        >
+          Distribuição Global
+        </h3>
+
+        @if (loadingChart()) {
+          <div class="h-48 flex items-center justify-center w-full">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        } @else if (chartData().series.length > 0) {
+          <div class="w-full flex justify-center -ml-2 invert-[0.05] dark:invert-0">
+            <apx-chart
+              [series]="chartData().series"
+              [chart]="chartOptions.chart!"
+              [labels]="chartData().labels"
+              [colors]="chartData().colors"
+              [plotOptions]="chartOptions.plotOptions!"
+              [dataLabels]="chartOptions.dataLabels!"
+              [legend]="chartOptions.legend!"
+              [tooltip]="chartOptions.tooltip!"
+              [responsive]="chartOptions.responsive!"
+            ></apx-chart>
+          </div>
+          <div class="flex flex-col gap-3 w-full mt-6">
+            @for (label of chartData().labels; track label; let i = $index) {
+              <div
+                class="flex items-center justify-between text-xs sm:text-sm group animate-in fade-in slide-in-from-right-2 duration-300"
+                [style]="'animation-delay: ' + (300 + i * 50) + 'ms; animation-fill-mode: both;'"
+              >
+                <div class="flex items-center gap-2.5">
+                  <span
+                    class="block w-2.5 h-2.5 rounded-full shadow-sm"
+                    [style.background-color]="chartData().colors[i]"
+                  ></span>
+                  <span
+                    class="text-muted-foreground truncate max-w-[120px] group-hover:text-foreground transition-colors"
+                    >{{ label }}</span
+                  >
+                </div>
+                <span class="font-bold text-foreground">
+                  {{ ((chartData().series[i] / (valorTotalGlobal() || 1)) * 100).toFixed(0) }}%
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <div
+            class="h-40 flex items-center justify-center text-muted-foreground text-sm w-full bg-muted/10 rounded-lg border border-dashed border-border mt-2 animate-in fade-in duration-500 delay-300"
+            style="animation-fill-mode: both"
+          >
+            Sem dados financeiros globais
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

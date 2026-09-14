@@ -1,0 +1,8 @@
+.env
+target
+temp_m2_repo
+immudb_states
+*.pfx
+*.p12
+*.bak
+.git

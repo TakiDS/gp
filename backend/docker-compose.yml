@@ -1,0 +1,85 @@
+services:
+  app:
+    build: .
+    container_name: backend-spring-java21
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Rio_Branco # <--- FUSO HORÁRIO AQUI
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_SECRET}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - API_SECURITY_TOKEN_SECRET=${JWT_SECRET}
+      - DATA_ENCRYPTION_KEY_BASE64=${DATA_ENCRYPTION_KEY_BASE64}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
+      - API_SECRET_GEMINI=${GEMINI_KEY}
+      - DANFE_API_URL=${DANFE_API_URL:-}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:4200}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+      - BOOTSTRAP_ADMIN_ENABLED=${BOOTSTRAP_ADMIN_ENABLED:-false}
+      - BOOTSTRAP_ADMIN_EMAIL=${BOOTSTRAP_ADMIN_EMAIL:-}
+      - BOOTSTRAP_ADMIN_PASSWORD=${BOOTSTRAP_ADMIN_PASSWORD:-}
+      - BOOTSTRAP_ADMIN_NAME=${BOOTSTRAP_ADMIN_NAME:-Administrador do Sistema}
+      - IMMUDB_HOST=immudb-server
+      - IMMUDB_PASSWORD=${IMMUDB_PASSWORD}
+      - SENHA_CERTIFICADO=${SENHA_CERTIFICADO}
+      - CAMINHO_CERTIFICADO=/app/certificados/certificado_fundape.pfx
+      - CAMINHO_SCHEMAS=/app/schemas
+    volumes:
+      - ./src/main/resources/certificados:/app/certificados:ro
+      - ./src/main/resources/schemas:/app/schemas:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      immudb:
+        condition: service_started
+    networks:
+      - sgp-network
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      - TZ=America/Rio_Branco # <--- FUSO NO MYSQL (Recomendado)
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME:-sgp}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - sgp-network
+      
+  immudb:
+    image: codenotary/immudb:latest
+    container_name: immudb-server   # Nome físico do container
+    hostname: immudb-server         # Nome que ele responde na rede (O PULO DO GATO)
+    environment:
+      - TZ=America/Rio_Branco # <--- FUSO NO IMMUDB (Recomendado)
+      - IMMUDB_ADMIN_PASSWORD=${IMMUDB_PASSWORD}
+      - IMMUDB_ADDRESS=0.0.0.0
+      - IMMUDB_MTLS=false
+      - IMMUDB_AUTH=true
+    ports:
+      - "127.0.0.1:3322:3322"
+      - "127.0.0.1:8081:8080"
+    networks:
+      sgp-network:
+        aliases:
+          - immudb-server  # Apelido extra para garantir
+
+networks:
+  sgp-network:
+    driver: bridge

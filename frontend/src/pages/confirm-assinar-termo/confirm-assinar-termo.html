@@ -1,0 +1,67 @@
+<div class="bg-background min-h-screen flex items-center justify-center font-sans p-4">
+  <div
+    class="max-w-md w-full px-8 py-10 text-center bg-card border border-border rounded-2xl shadow-xl transition-all"
+  >
+    @if (status() === 'loading') {
+      <div class="flex flex-col items-center animate-pulse">
+        <lucide-angular
+          [img]="Loader2"
+          class="w-16 h-16 text-primary animate-spin mb-4"
+        ></lucide-angular>
+        <h1 class="text-xl font-bold">Processando assinatura...</h1>
+        <p class="text-muted-foreground text-sm">
+          Aguarde um instante enquanto validamos seu termo.
+        </p>
+      </div>
+    }
+
+    @if (status() === 'success') {
+      <div class="flex justify-center mb-6">
+        <div class="p-4 bg-green-500/10 rounded-full">
+          <lucide-angular [img]="BadgeCheck" strokeWidth="2" class="w-16 h-16 text-[#3aa982]">
+          </lucide-angular>
+        </div>
+      </div>
+
+      <h1 class="text-2xl font-bold text-foreground mb-2">Assinatura Confirmada!</h1>
+      <p class="text-muted-foreground text-sm mb-6">
+        O termo de comodato foi processado e assinado digitalmente com sucesso.
+      </p>
+
+      <div class="flex items-center gap-2 mb-6">
+        <div class="h-px flex-1 bg-border"></div>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50"
+          >Detalhes</span
+        >
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+
+      <div class="space-y-3">
+        <button
+          (click)="baixarTermo()"
+          class="flex items-center justify-center w-full gap-2 text-muted-foreground hover:text-foreground text-sm font-medium py-2 transition-colors cursor-pointer"
+        >
+          <lucide-angular [img]="Download" size="16"></lucide-angular>
+          Baixar cópia do termo (PDF)
+        </button>
+      </div>
+
+      <p class="mt-8 text-[11px] text-muted-foreground/60">
+        Uma cópia assinada foi enviada para o seu e-mail cadastrado.
+      </p>
+    }
+
+    @if (status() === 'error') {
+      <div class="flex flex-col items-center">
+        <div class="p-4 bg-red-500/10 rounded-full mb-6">
+          <lucide-angular [img]="AlertCircle" class="w-16 h-16 text-red-500"></lucide-angular>
+        </div>
+        <h1 class="text-2xl font-bold text-foreground mb-2">Ops! Algo deu errado.</h1>
+        <p class="text-muted-foreground text-sm mb-6">{{ mensagemErro() }}</p>
+        <button (click)="ngOnInit()" class="text-primary font-medium hover:underline text-sm">
+          Tentar novamente
+        </button>
+      </div>
+    }
+  </div>
+</div>

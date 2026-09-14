@@ -1,0 +1,138 @@
+<div
+  *ngIf="sidebarService.isOpen()"
+  (click)="sidebarService.close()"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[80] md:hidden animate-in fade-in duration-300"
+  style="animation-fill-mode: both"
+></div>
+
+<!--
+  ✅ top-16 md:top-20 — começa abaixo do header (h-16 mobile / h-20 desktop)
+  ✅ h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] — altura restante após o header
+-->
+<aside
+  [class.translate-x-0]="sidebarService.isOpen()"
+  [class.-translate-x-full]="!sidebarService.isOpen()"
+  class="fixed top-16 md:top-20 left-0 z-[90] w-64 md:w-52 h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] bg-card border-r border-border p-4 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0"
+>
+  <div class="flex flex-col h-full">
+    <ul
+      class="flex flex-col gap-2 overflow-y-auto flex-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <li
+        class="px-4 mb-2 mt-2 animate-in fade-in slide-in-from-left-3 duration-500 delay-75"
+        style="animation-fill-mode: both"
+      >
+        <span class="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/40">
+          Menu Principal
+        </span>
+      </li>
+
+      <div
+        class="flex flex-col gap-2 animate-in fade-in slide-in-from-left-3 duration-500 delay-100"
+        style="animation-fill-mode: both"
+      >
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/patrimonios', icon: Landmark, label: 'Patrimônios' }
+          "
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/list-notas', icon: FileAxis3D, label: 'Notas Fiscais' }
+          "
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/dashboard', icon: ChartColumnIncreasing, label: 'Dashboard' }
+          "
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/historico-geral', icon: History, label: 'Histórico' }
+          "
+        ></ng-container>
+      </div>
+
+      <div
+        class="h-px bg-border/60 my-2 mx-4 animate-in fade-in duration-500 delay-150"
+        style="animation-fill-mode: both"
+      ></div>
+
+      <li
+        class="px-4 mb-2 animate-in fade-in slide-in-from-left-3 duration-500 delay-200"
+        style="animation-fill-mode: both"
+      >
+        <span class="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/40">
+          Administrativo
+        </span>
+      </li>
+
+      <div
+        class="flex flex-col gap-2 animate-in fade-in slide-in-from-left-3 duration-500 delay-[220ms]"
+        style="animation-fill-mode: both"
+      >
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/list-locals', icon: MapPin, label: 'Locais' }
+          "
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/categories', icon: Tag, label: 'Categorias' }
+          "
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/detentores', icon: UserCheck, label: 'Detentores' }
+          "
+        ></ng-container>
+
+        <ng-container *ngIf="isAdmin">
+          <ng-container
+            *ngTemplateOutlet="
+              menuItem;
+              context: { link: '/usuarios', icon: User, label: 'Usuários' }
+            "
+          ></ng-container>
+        </ng-container>
+
+        <ng-container
+          *ngTemplateOutlet="
+            menuItem;
+            context: { link: '/comodatos', icon: User, label: 'Comodatos' }
+          "
+        ></ng-container>
+      </div>
+    </ul>
+  </div>
+</aside>
+
+<ng-template #menuItem let-link="link" let-icon="icon" let-label="label">
+  <li
+    [routerLink]="link"
+    routerLinkActive
+    #rla="routerLinkActive"
+    (click)="sidebarService.close()"
+    [routerLinkActiveOptions]="{ exact: false }"
+    [class]="
+      rla.isActive
+        ? 'flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer select-none transition-all duration-200 bg-[#212d6b] text-white shadow-[0_10px_15px_-3px_rgba(33,45,107,0.3)] -translate-y-[1px]'
+        : 'flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer select-none transition-all duration-200 text-foreground/60 hover:bg-accent hover:text-foreground'
+    "
+  >
+    <lucide-angular
+      [img]="icon"
+      size="22"
+      strokeWidth="2"
+      [class]="rla.isActive ? 'text-white' : 'transition-colors'"
+    ></lucide-angular>
+    <span class="text-base font-semibold tracking-tight">{{ label }}</span>
+  </li>
+</ng-template>

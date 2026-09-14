@@ -1,0 +1,15 @@
+<div
+  class="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300"
+>
+  <app-header class="shrink-0 z-[100] relative"></app-header>
+
+  <div class="flex flex-1">
+    <app-sidebar></app-sidebar>
+
+    <main class="flex-1 md:pl-52 overflow-y-auto">
+      <div class="px-8 py-6 max-w-[1400px] mx-auto">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,1004 @@
+<div
+  class="py-6 md:px-5 md:py-8 min-h-screen bg-background text-foreground selection:bg-primary/10"
+>
+  <div class="max-w-4xl mx-auto mb-10">
+    <button
+      (click)="voltar()"
+      class="flex items-center gap-2 text-muted-foreground hover:text-primary transition-all text-sm font-medium mb-6 group"
+    >
+      <lucide-angular
+        [img]="Icons.ArrowLeft"
+        size="16"
+        class="group-hover:-translate-x-1 transition-transform"
+      ></lucide-angular>
+      Voltar
+    </button>
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+          <lucide-angular [img]="Icons.Activity" size="28" class="text-primary"></lucide-angular>
+          Histórico Geral
+        </h1>
+        <p class="text-muted-foreground text-base mt-1">
+          Acompanhe em tempo real as movimentações e edições de todo o acervo.
+        </p>
+      </div>
+
+      <div
+        class="bg-card border border-border px-4 py-2 rounded-lg shadow-sm flex items-center gap-3"
+      >
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <div>
+          <span class="text-sm font-medium text-muted-foreground mr-2">Total de eventos:</span>
+          <span class="text-base font-bold text-primary">{{ totalElements() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto relative">
+    <div
+      class="absolute top-0 bottom-0 w-px bg-gradient-to-b from-border via-border to-transparent ml-[17px] hidden sm:block"
+    ></div>
+
+    <div class="space-y-10">
+      @if (isLoading()) {
+        @for (i of [1, 2, 3]; track $index) {
+          <div class="flex gap-6 relative opacity-70">
+            <div class="relative z-10 hidden sm:flex shrink-0">
+              <div class="w-9 h-9 rounded-full bg-muted animate-pulse border border-border"></div>
+            </div>
+
+            <div class="flex-1 bg-card rounded-2xl border border-border shadow-sm">
+              <div
+                class="bg-muted/10 border-b border-border p-4 rounded-t-2xl flex flex-wrap items-center justify-between gap-4"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-muted animate-pulse shrink-0"></div>
+                  <div class="space-y-2">
+                    <div class="h-4 bg-muted animate-pulse rounded w-48"></div>
+                    <div class="flex items-center gap-2">
+                      <div class="h-3 bg-muted animate-pulse rounded w-20"></div>
+                      <div class="h-3 bg-muted animate-pulse rounded w-32"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col items-end gap-2 hidden sm:flex">
+                  <div class="h-4 bg-muted animate-pulse rounded-full w-24"></div>
+                  <div class="h-3 bg-muted animate-pulse rounded w-32"></div>
+                </div>
+              </div>
+
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-4">
+                  <div
+                    class="w-6 h-6 rounded-full bg-muted animate-pulse border border-border"
+                  ></div>
+                  <div class="h-3 bg-muted animate-pulse rounded w-40"></div>
+                </div>
+
+                <div
+                  class="h-24 bg-muted/30 animate-pulse rounded-xl border border-border w-full"
+                ></div>
+
+                <div class="mt-5 pt-3 border-t border-border flex justify-between items-center">
+                  <div class="h-3 bg-muted animate-pulse rounded w-32"></div>
+                  <div class="h-3 bg-muted animate-pulse rounded w-24"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (log of historico(); track $index) {
+          @let config = getConfig(log.detalhesLog.acao);
+          @let totalAlteracoes = countChanges(log.detalhesLog.detalhes);
+
+          <div
+            class="flex gap-6 relative group animate-in fade-in slide-in-from-bottom-4 duration-500"
+            [style.animation-delay]="$index * 50 + 'ms'"
+          >
+            <div class="relative z-10 hidden sm:flex shrink-0">
+              <div
+                [class]="
+                  'w-9 h-9 rounded-full flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110 bg-background ' +
+                  config.cor +
+                  ' border-current/20'
+                "
+              >
+                <lucide-angular [img]="config.icone" size="18"></lucide-angular>
+              </div>
+            </div>
+
+            <div
+              class="flex-1 bg-card rounded-2xl border border-border shadow-sm group-hover:shadow-md transition-all"
+            >
+              <div
+                class="bg-muted/30 border-b border-border p-4 rounded-t-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              >
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm mt-0.5"
+                  >
+                    <lucide-angular
+                      [img]="Icons.Monitor"
+                      size="20"
+                      class="text-foreground/70"
+                    ></lucide-angular>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-base font-bold text-foreground leading-tight break-words">
+                      {{ log.detalhesLog.descricao }}
+                    </h3>
+
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                      <span
+                        class="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 shrink-0"
+                      >
+                        {{ log.detalhesLog.detalhes.numeroPatrimonio }}
+                      </span>
+                      @if (log.detalhesLog.numeroSerie) {
+                        <span
+                          class="text-xs text-muted-foreground flex items-center gap-1 font-medium whitespace-nowrap"
+                        >
+                          <lucide-angular [img]="Icons.Barcode" size="12"></lucide-angular>
+                          SN: {{ log.detalhesLog.numeroSerie }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 pt-3 sm:pt-0 border-t border-border/10 sm:border-0 shrink-0"
+                >
+                  <div class="flex items-center gap-2">
+                    <span
+                      [class]="
+                        'text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-current/20 bg-background ' +
+                        config.cor
+                      "
+                    >
+                      {{ config.label }}
+                    </span>
+                  </div>
+                  <time
+                    class="text-[11px] sm:text-xs font-mono font-medium text-muted-foreground whitespace-nowrap"
+                  >
+                    {{ log.detalhesLog.dataHora | date: 'dd/MM/yyyy HH:mm' }}
+                  </time>
+                </div>
+              </div>
+
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-4">
+                  <div
+                    class="w-6 h-6 rounded-full bg-muted flex items-center justify-center border border-border"
+                  >
+                    <lucide-angular
+                      [img]="Icons.User"
+                      size="12"
+                      class="text-muted-foreground"
+                    ></lucide-angular>
+                  </div>
+                  <span class="text-sm font-medium text-muted-foreground">
+                    Modificado por
+                    <strong class="text-foreground">{{ log.detalhesLog.autor.nome }}</strong>
+                  </span>
+                  @if (totalAlteracoes > 3) {
+                    <span
+                      class="text-[11px] bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded uppercase font-bold ml-auto"
+                      >Múltiplas Alterações</span
+                    >
+                  }
+                </div>
+
+                <div class="space-y-4">
+                  @switch (log.detalhesLog.acao) {
+                    @case ('CRIACAO') {
+                      <div
+                        class="bg-emerald-500/5 border border-emerald-500/10 p-3 sm:p-4 rounded-xl flex items-start sm:items-center gap-3 sm:gap-4"
+                      >
+                        <lucide-angular
+                          [img]="Icons.PlusCircle"
+                          size="24"
+                          class="text-emerald-500 opacity-50 shrink-0 mt-0.5 sm:mt-0"
+                        ></lucide-angular>
+                        <p class="text-sm text-emerald-700 dark:text-emerald-400">
+                          O item foi cadastrado no sistema com sucesso.
+                        </p>
+                      </div>
+                    }
+
+                    @case ('EDICAO') {
+                      <div class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                          @if (log.detalhesLog.detalhes.para?.localizacao; as loc) {
+                            <div
+                              class="col-span-full bg-blue-500/5 border border-blue-500/10 p-3 rounded-xl"
+                            >
+                              <span
+                                class="text-[10px] font-bold text-blue-500 uppercase tracking-widest flex items-center gap-2 mb-2"
+                              >
+                                <lucide-angular [img]="Icons.MapPin" size="14"></lucide-angular>
+                                Movimentação
+                              </span>
+                              <div
+                                class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-sm"
+                              >
+                                <span class="text-muted-foreground line-through break-words">{{
+                                  loc.de?.nome || 'Sem local anterior'
+                                }}</span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-blue-500 hidden sm:block shrink-0"
+                                ></lucide-angular>
+                                <lucide-angular
+                                  [img]="Icons.ArrowDown"
+                                  size="14"
+                                  class="text-blue-500 block sm:hidden shrink-0 ml-1"
+                                ></lucide-angular>
+                                <span class="font-bold text-foreground break-words">{{
+                                  loc.para?.nome || 'Sem destino (Baixa/Removido)'
+                                }}</span>
+                              </div>
+                            </div>
+                          }
+
+                          @if (log.detalhesLog.detalhes.para?.estado; as est) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.Activity" size="12"></lucide-angular>
+                                Mudança de Estado
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-xs">
+                                <span
+                                  [class]="
+                                    'px-2 py-0.5 rounded-md line-through opacity-50 ' +
+                                    getStatusClass(est.de)
+                                  "
+                                  >{{ est.de }}</span
+                                >
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-primary"
+                                ></lucide-angular>
+                                <span
+                                  [class]="
+                                    'px-2 py-0.5 rounded-md shadow-sm ' + getStatusClass(est.para)
+                                  "
+                                  >{{ est.para }}</span
+                                >
+                              </div>
+                            </div>
+                          }
+
+                          @if (
+                            log.detalhesLog.detalhes.para?.patrimonioGeral?.valorAquisicao;
+                            as valor
+                          ) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.DollarSign" size="12"></lucide-angular>
+                                Valor
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-sm">
+                                <span class="text-muted-foreground/50 line-through">{{
+                                  valor.de | currency: 'BRL'
+                                }}</span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-emerald-500"
+                                ></lucide-angular>
+                                <span class="font-bold text-foreground">{{
+                                  valor.para | currency: 'BRL'
+                                }}</span>
+                              </div>
+                            </div>
+                          }
+
+                          @if (
+                            log.detalhesLog.detalhes.para?.patrimonioGeral?.dataAquisicao;
+                            as dataAcq
+                          ) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.Calendar" size="12"></lucide-angular>
+                                Data de Aquisição
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-sm">
+                                <span class="text-muted-foreground/50 line-through">{{
+                                  dataAcq.de | date: 'dd/MM/yyyy'
+                                }}</span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-primary"
+                                ></lucide-angular>
+                                <span class="font-bold text-foreground">{{
+                                  dataAcq.para | date: 'dd/MM/yyyy'
+                                }}</span>
+                              </div>
+                            </div>
+                          }
+
+                          @if (log.detalhesLog.detalhes.para?.numSerie; as serial) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.Barcode" size="12"></lucide-angular> Nº
+                                de Série
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-sm">
+                                <span class="text-muted-foreground/50 line-through break-all">{{
+                                  serial.de || 'Nenhum'
+                                }}</span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-primary shrink-0"
+                                ></lucide-angular>
+                                <span class="font-bold text-foreground break-all">{{
+                                  serial.para
+                                }}</span>
+                              </div>
+                            </div>
+                          }
+
+                          @if (log.detalhesLog.detalhes.para?.patrimonioGeral?.notaFiscal; as nf) {
+                            <div
+                              class="col-span-full bg-amber-500/5 border border-amber-500/10 p-3 sm:p-4 rounded-xl shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-amber-600 block mb-3 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.FileText" size="14"></lucide-angular>
+                                Vínculo de Nota Fiscal
+                              </label>
+
+                              <div
+                                class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+                              >
+                                <div class="flex items-center gap-3">
+                                  <div
+                                    class="w-10 h-10 rounded-lg bg-background border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm shrink-0"
+                                  >
+                                    <lucide-angular
+                                      [img]="Icons.FileText"
+                                      size="20"
+                                    ></lucide-angular>
+                                  </div>
+                                  <div>
+                                    <p class="text-sm font-bold text-foreground leading-none">
+                                      {{ nf.para.codigoNota }}
+                                    </p>
+                                    <p
+                                      class="text-[11px] text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-none"
+                                    >
+                                      {{ nf.para.fornecedor }} •
+                                      {{ nf.para.dataEmissao | date: 'dd/MM/yyyy' }}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border-t border-amber-500/10 md:border-0 pt-3 md:pt-0"
+                                >
+                                  <div
+                                    class="flex sm:flex-col justify-between sm:justify-start items-center sm:items-end text-left sm:text-right"
+                                  >
+                                    <p
+                                      class="text-[10px] uppercase font-bold text-muted-foreground"
+                                    >
+                                      Valor da Nota
+                                    </p>
+                                    <p class="text-sm font-bold text-emerald-600">
+                                      {{ nf.para.valorTotalNota | currency: 'BRL' }}
+                                    </p>
+                                  </div>
+
+                                  <a
+                                    [href]="nf.para.notaFiscalUrl"
+                                    target="_blank"
+                                    class="flex items-center justify-center sm:justify-start gap-2 px-3 py-2 sm:py-1.5 bg-background border border-border rounded-lg text-xs font-bold hover:bg-muted transition-colors shadow-sm w-full sm:w-auto"
+                                  >
+                                    <lucide-angular
+                                      [img]="Icons.ExternalLink"
+                                      size="12"
+                                    ></lucide-angular>
+                                    Ver PDF
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          }
+
+                          @if (log.detalhesLog.detalhes.para?.patrimonioGeral?.categoria; as cat) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.Layers" size="12"></lucide-angular>
+                                Categoria
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-sm">
+                                <span
+                                  class="text-muted-foreground/50 line-through decoration-muted-foreground/30"
+                                >
+                                  {{ cat.de.nome || 'Sem Categoria' }}
+                                </span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-primary shrink-0"
+                                ></lucide-angular>
+                                <span class="font-bold text-foreground">{{ cat.para.nome }}</span>
+                              </div>
+                            </div>
+                          }
+
+                          @if (log.detalhesLog.detalhes.para?.patrimonioGeral?.descricao; as desc) {
+                            <div
+                              class="col-span-full bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.FileText" size="12"></lucide-angular>
+                                Descrição do Item
+                              </label>
+                              <div class="space-y-1">
+                                <p
+                                  class="text-xs text-muted-foreground/50 line-through decoration-muted-foreground/30 italic"
+                                >
+                                  "{{ desc.de }}"
+                                </p>
+                                <div class="flex items-start sm:items-center gap-2">
+                                  <lucide-angular
+                                    [img]="Icons.CornerDownRight"
+                                    size="12"
+                                    class="text-primary mt-1 sm:mt-0 shrink-0"
+                                  ></lucide-angular>
+                                  <p class="text-sm font-medium text-foreground">
+                                    "{{ desc.para }}"
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    @case ('MOVIMENTACAO') {
+                      <div class="space-y-4">
+                        @if (log.detalhesLog.detalhes.para?.localizacao; as loc) {
+                          <div class="bg-blue-500/5 border border-blue-500/10 p-3 rounded-xl">
+                            <span
+                              class="text-[10px] font-bold text-blue-500 uppercase tracking-widest flex items-center gap-2 mb-2"
+                            >
+                              <lucide-angular [img]="Icons.MapPin" size="14"></lucide-angular>
+                              Movimentação de Local
+                            </span>
+                            <div
+                              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-sm"
+                            >
+                              <span
+                                class="text-muted-foreground line-through decoration-muted-foreground/30 break-words flex-1"
+                              >
+                                {{ loc.de?.nome || 'Sem local anterior' }}
+                              </span>
+                              <lucide-angular
+                                [img]="Icons.ArrowRight"
+                                size="14"
+                                class="text-blue-500 shrink-0 hidden sm:block"
+                              ></lucide-angular>
+                              <lucide-angular
+                                [img]="Icons.ArrowDown"
+                                size="14"
+                                class="text-blue-500 shrink-0 block sm:hidden ml-1"
+                              ></lucide-angular>
+                              <span
+                                class="font-bold text-foreground break-words flex-1 sm:text-right"
+                              >
+                                {{ loc.para?.nome || 'Sem destino (Baixa/Removido)' }}
+                              </span>
+                            </div>
+                          </div>
+                        }
+
+                        <div class="grid grid-cols-1 gap-3">
+                          @if (log.detalhesLog.detalhes.para?.estado; as est) {
+                            <div
+                              class="bg-background p-3 rounded-xl border border-border shadow-sm"
+                            >
+                              <label
+                                class="text-[10px] font-black uppercase text-muted-foreground block mb-2 flex items-center gap-1"
+                              >
+                                <lucide-angular [img]="Icons.Activity" size="12"></lucide-angular>
+                                Atualização de Estado
+                              </label>
+                              <div class="flex flex-wrap items-center gap-2 text-xs">
+                                <span
+                                  [class]="
+                                    'px-2 py-0.5 rounded-md line-through opacity-50 ' +
+                                    getStatusClass(est.de)
+                                  "
+                                >
+                                  {{ est.de }}
+                                </span>
+                                <lucide-angular
+                                  [img]="Icons.ArrowRight"
+                                  size="14"
+                                  class="text-primary"
+                                ></lucide-angular>
+                                <span
+                                  [class]="
+                                    'px-2 py-0.5 rounded-md shadow-sm font-bold ' +
+                                    getStatusClass(est.para)
+                                  "
+                                >
+                                  {{ est.para }}
+                                </span>
+                              </div>
+                            </div>
+                          }
+                        </div>
+
+                        @if (log.detalhesLog.detalhes.para?.observacao_lote; as obs) {
+                          <div
+                            class="mt-4 bg-amber-500/5 border border-amber-500/10 p-3 rounded-xl"
+                          >
+                            <label
+                              class="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-2 mb-1"
+                            >
+                              <lucide-angular
+                                [img]="Icons.MessageSquare"
+                                size="14"
+                              ></lucide-angular>
+                              Motivo / Observação
+                            </label>
+                            <p class="text-sm text-amber-900/80 dark:text-amber-200/80 italic">
+                              "{{ obs }}"
+                            </p>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    @case ('EMPRESTIMO') {
+                      <div
+                        class="bg-indigo-500/5 border border-indigo-500/10 p-3 sm:p-4 rounded-xl flex flex-col gap-4"
+                      >
+                        <div class="flex items-start sm:items-center gap-3">
+                          <div
+                            class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5 sm:mt-0"
+                          >
+                            <lucide-angular [img]="Icons.UserPlus" size="18"></lucide-angular>
+                          </div>
+                          <div>
+                            <span
+                              class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest block"
+                            >
+                              Empréstimo / Atribuição de Posse
+                            </span>
+                            <p class="text-sm text-indigo-900/80 dark:text-indigo-300">
+                              O item foi vinculado a um novo responsável.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div
+                          class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 bg-background/50 p-3 sm:p-4 rounded-lg border border-indigo-500/10"
+                        >
+                          <div class="flex flex-col w-full sm:w-auto text-center sm:text-left">
+                            <span class="text-[10px] text-muted-foreground uppercase font-bold"
+                              >Origem</span
+                            >
+                            <span class="text-sm font-medium">{{
+                              log.detalhesLog.detalhes.de
+                            }}</span>
+                          </div>
+
+                          <lucide-angular
+                            [img]="Icons.ArrowRight"
+                            size="16"
+                            class="text-indigo-500 animate-pulse hidden sm:block rotate-0"
+                          ></lucide-angular>
+
+                          <lucide-angular
+                            [img]="Icons.ArrowDown"
+                            size="16"
+                            class="text-indigo-500 animate-pulse block sm:hidden"
+                          ></lucide-angular>
+
+                          <div class="flex flex-col w-full sm:w-auto text-center sm:text-right">
+                            <span class="text-[10px] text-muted-foreground uppercase font-bold"
+                              >Novo Responsável</span
+                            >
+                            <span class="text-sm font-extrabold text-foreground">{{
+                              log.detalhesLog.detalhes.para
+                            }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    @case ('APAGADO') {
+                      <div
+                        class="bg-rose-500/5 border border-rose-500/10 p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
+                      >
+                        <div
+                          class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0"
+                        >
+                          <lucide-angular
+                            [img]="Icons.Trash2"
+                            size="20"
+                            class="text-rose-500 sm:w-6 sm:h-6 w-5 h-5"
+                          ></lucide-angular>
+                        </div>
+                        <div class="flex-1">
+                          <p class="text-sm text-rose-800 dark:text-rose-400 font-bold">
+                            Item removido permanentemente.
+                          </p>
+                          <p class="text-xs text-rose-600/70 dark:text-rose-500/70 mt-0.5">
+                            Este registro foi excluído do acervo digital e não pode mais ser
+                            editado.
+                          </p>
+
+                          @if (log.detalhesLog.detalhes.de) {
+                            <div class="mt-3 pt-2 border-t border-rose-500/10">
+                              <span class="text-[10px] font-bold text-rose-500 uppercase"
+                                >Observação de Saída:</span
+                              >
+                              <p
+                                class="text-sm italic text-rose-700/80 dark:text-rose-300/80 break-words"
+                              >
+                                "{{ log.detalhesLog.detalhes.de }}"
+                              </p>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    @case ('SAIDA_PATRIMONIAL') {
+                      <div class="space-y-4">
+                        <div
+                          class="bg-rose-500/5 border border-rose-500/10 p-3 sm:p-4 rounded-xl flex flex-col gap-4"
+                        >
+                          <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0"
+                          >
+                            <div class="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+                              <div
+                                class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-600 shrink-0 mt-0.5 sm:mt-0"
+                              >
+                                <lucide-angular [img]="Icons.LogOut" size="18"></lucide-angular>
+                              </div>
+                              <div class="flex-1">
+                                <span
+                                  class="text-[10px] font-bold text-rose-500 uppercase tracking-widest block"
+                                >
+                                  Baixa / Saída de Acervo
+                                </span>
+                                <p class="text-sm font-medium text-rose-900/80 dark:text-rose-300">
+                                  O item foi removido do inventário ativo.
+                                </p>
+                              </div>
+                            </div>
+
+                            @if (log.detalhesLog.detalhes.para?.url_documento) {
+                              <a
+                                [href]="log.detalhesLog.detalhes.para.url_documento"
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 px-3 py-2 sm:py-1.5 bg-background border border-rose-200 dark:border-rose-900/30 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors shadow-sm w-full sm:w-auto"
+                              >
+                                <lucide-angular [img]="Icons.FileText" size="14"></lucide-angular>
+                                Ver Termo
+                              </a>
+                            }
+                          </div>
+
+                          <div
+                            class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-background/50 p-3 rounded-lg border border-rose-500/10"
+                          >
+                            <div class="flex flex-col">
+                              <span class="text-[10px] text-muted-foreground uppercase font-bold"
+                                >Origem do Processo</span
+                              >
+                              <span class="text-sm font-medium break-words">{{
+                                log.detalhesLog.detalhes.de
+                              }}</span>
+                            </div>
+                            <div
+                              class="flex flex-col text-left sm:text-right border-t border-rose-500/10 pt-2 sm:border-0 sm:pt-0"
+                            >
+                              <span class="text-[10px] text-muted-foreground uppercase font-bold"
+                                >Motivo Real</span
+                              >
+                              <span class="text-sm font-extrabold text-rose-600 break-words">
+                                {{ log.detalhesLog.detalhes.para?.motivo_real }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        @if (log.detalhesLog.detalhes.para?.observacao) {
+                          <div class="bg-slate-500/5 border border-slate-500/10 p-3 rounded-xl">
+                            <label
+                              class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 mb-1"
+                            >
+                              <lucide-angular
+                                [img]="Icons.MessageSquare"
+                                size="14"
+                              ></lucide-angular>
+                              Observação da Saída
+                            </label>
+                            <p class="text-sm text-foreground italic break-words">
+                              "{{ log.detalhesLog.detalhes.para.observacao }}"
+                            </p>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    @case ('COMODATO_CRIADO') {
+                      <div
+                        class="bg-emerald-500/5 border border-emerald-500/10 p-3 sm:p-4 rounded-xl space-y-3"
+                      >
+                        <div class="flex items-start sm:items-center gap-3">
+                          <lucide-angular
+                            [img]="Icons.FilePlus"
+                            size="20"
+                            class="text-emerald-500 shrink-0 mt-0.5 sm:mt-0"
+                          ></lucide-angular>
+                          <p class="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+                            Registro de comodato gerado para
+                            <b class="break-words">{{
+                              log.detalhesLog.detalhes.para?.titular_vinculado
+                            }}</b
+                            >.
+                          </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span
+                            class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 break-words"
+                          >
+                            Status: {{ log.detalhesLog.detalhes.para?.status_inicial }}
+                          </span>
+                        </div>
+                      </div>
+                    }
+
+                    @case ('COMODATO_ASSINADO') {
+                      <div
+                        class="bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl flex items-start gap-4"
+                      >
+                        <div
+                          class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0"
+                        >
+                          <lucide-angular [img]="Icons.Signature" size="20"></lucide-angular>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                          <p
+                            class="text-sm font-bold text-blue-700 dark:text-blue-400 leading-none"
+                          >
+                            Termo Assinado
+                          </p>
+
+                          @if (log.detalhesLog.detalhes.para?.observacao) {
+                            <p
+                              class="text-xs text-blue-600/80 dark:text-blue-400/80 mt-2 italic leading-relaxed break-words"
+                            >
+                              "{{ log.detalhesLog.detalhes.para?.observacao }}"
+                            </p>
+                          }
+
+                          <div
+                            class="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+                          >
+                            <span
+                              class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/10"
+                            >
+                              {{ log.detalhesLog.detalhes.para?.status_atualizado || 'Assinado' }}
+                            </span>
+
+                            @if (log.detalhesLog.detalhes.para?.url_documento) {
+                              <a
+                                [href]="log.detalhesLog.detalhes.para.url_documento"
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[11px] font-bold text-emerald-500 hover:bg-emerald-500/20 transition-colors w-full sm:w-auto"
+                              >
+                                <lucide-angular [img]="Icons.FileText" size="13"></lucide-angular>
+                                Ver Termo Assinado (PDF)
+                              </a>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    @case ('COMODATO_DEVOLUCAO') {
+                      <div
+                        class="bg-purple-500/5 border border-purple-500/10 p-4 rounded-xl flex items-start gap-4"
+                      >
+                        <div
+                          class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0"
+                        >
+                          <lucide-angular [img]="Icons.PackageCheck" size="20"></lucide-angular>
+                        </div>
+                        <div class="flex-1">
+                          <p
+                            class="text-sm font-bold text-purple-700 dark:text-purple-400 leading-none"
+                          >
+                            Devolução de Comodato
+                          </p>
+                          <p
+                            class="text-xs text-purple-600/80 dark:text-purple-400/80 mt-2 italic leading-relaxed"
+                          >
+                            "{{ log.detalhesLog.detalhes.para?.observacao_devolucao }}"
+                          </p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <span
+                              class="text-[10px] font-bold uppercase text-purple-500/70 dark:text-purple-400/70"
+                              >Equipamento Retornado</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    @case ('COMODATO_CANCELADO') {
+                      <div
+                        class="bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl flex items-start gap-4"
+                      >
+                        <div
+                          class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0"
+                        >
+                          <lucide-angular [img]="Icons.AlertCircle" size="20"></lucide-angular>
+                        </div>
+                        <div class="flex-1">
+                          <p
+                            class="text-sm font-bold text-amber-700 dark:text-amber-400 leading-none"
+                          >
+                            Cancelamento de Processo
+                          </p>
+                          <p
+                            class="text-xs text-amber-600/80 dark:text-amber-400/80 mt-2 italic leading-relaxed"
+                          >
+                            "{{ log.detalhesLog.detalhes.para?.motivo_cancelamento }}"
+                          </p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <span
+                              class="text-[10px] font-bold uppercase text-amber-500/70 dark:text-amber-400/70"
+                              >Processo Cancelado</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    @case ('COMODATO_DELETADO') {
+                      <div
+                        class="bg-rose-500/5 border border-rose-500/10 p-4 rounded-xl flex items-start gap-4"
+                      >
+                        <div
+                          class="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0"
+                        >
+                          <lucide-angular [img]="Icons.Trash2" size="20"></lucide-angular>
+                        </div>
+                        <div class="flex-1">
+                          <p
+                            class="text-sm font-bold text-rose-700 dark:text-rose-400 leading-none"
+                          >
+                            Registro de Comodato Excluído
+                          </p>
+                          <p
+                            class="text-xs text-rose-600/80 dark:text-rose-400/80 mt-2 italic leading-relaxed"
+                          >
+                            "{{ log.detalhesLog.detalhes.para?.justificativa_delecao }}"
+                          </p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <span
+                              class="text-[10px] font-bold uppercase text-rose-500/70 dark:text-rose-400/70"
+                              >Exclusão Permanente</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+
+                <div
+                  class="mt-5 pt-3 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div class="flex items-center gap-1.5 text-muted-foreground/40 min-w-0">
+                    <lucide-angular [img]="Icons.Hash" size="12" class="shrink-0"></lucide-angular>
+                    <span
+                      class="text-[10px] sm:text-xs font-mono uppercase tracking-tighter truncate"
+                      title="{{ log.detalhesLog.uuidEntidade }}"
+                    >
+                      {{ log.detalhesLog.uuidEntidade }}
+                    </span>
+                  </div>
+
+                  <div class="flex justify-end shrink-0">
+                    @if (log.detalhesLog.acao !== 'APAGADO') {
+                      <button
+                        routerLink="/detail-patrimonio/{{ log.detalhesLog.uuidEntidade }}"
+                        class="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline whitespace-nowrap bg-primary/5 sm:bg-transparent px-2 py-1 sm:p-0 rounded-md"
+                      >
+                        <span>Ver Perfil do Patrimônio</span>
+                        <lucide-angular
+                          [img]="Icons.ExternalLink"
+                          size="12"
+                          class="shrink-0"
+                        ></lucide-angular>
+                      </button>
+                    } @else {
+                      <span
+                        class="text-xs font-medium text-muted-foreground/40 italic flex items-center gap-1"
+                      >
+                        <lucide-angular [img]="Icons.Trash2" size="12"></lucide-angular>
+                        Item indisponível
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        @if (historico().length === 0) {
+          <div
+            class="flex flex-col items-center justify-center py-32 bg-card rounded-2xl border-2 border-dashed border-border text-muted-foreground"
+          >
+            <div class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+              <lucide-angular [img]="Icons.Inbox" size="32" class="opacity-20"></lucide-angular>
+            </div>
+            <p class="font-bold text-xl">Sem Histórico</p>
+            <p class="text-base opacity-60">Nenhuma atividade registrada no sistema ainda.</p>
+          </div>
+        }
+      }
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="mt-16 flex flex-col items-center gap-6">
+        <div class="bg-card border border-border p-2 rounded-2xl shadow-lg ring-4 ring-background">
+          <zard-pagination-custom
+            [paginaAtual]="paginaAtual()"
+            [totalPaginas]="totalPaginas()"
+            (paginaChange)="onPaginaChange($event)"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</div>

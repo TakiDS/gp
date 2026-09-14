@@ -1,0 +1,167 @@
+<div
+  class="py-6 md:px-5 md:py-8 bg-background min-h-screen text-foreground transition-colors duration-300"
+  [formGroup]="categoriasForm"
+>
+  <div
+    class="mb-8 flex flex-col gap-1 animate-in fade-in slide-in-from-top-4 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Categorias</h1>
+    <p
+      class="text-muted-foreground text-sm md:text-base font-medium animate-in fade-in slide-in-from-top-3 duration-500 delay-75"
+      style="animation-fill-mode: both"
+    >
+      Gerencie o agrupamento dos seus bens patrimoniais.
+    </p>
+  </div>
+
+  <div
+    class="bg-card text-card-foreground rounded-xl shadow-sm p-4 md:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border border-border mb-8 animate-in fade-in slide-in-from-top-4 duration-500 delay-100"
+    style="animation-fill-mode: both"
+  >
+    <div class="relative w-full md:w-80 group">
+      <lucide-angular
+        [img]="Search"
+        size="18"
+        strokeWidth="2.5"
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors duration-300 pointer-events-none"
+      ></lucide-angular>
+      <input
+        type="text"
+        class="w-full h-11 pl-11 pr-4 bg-background border border-input rounded-lg outline-none text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/30 focus:border-primary transition-all duration-300"
+        placeholder="Pesquisar categoria..."
+        formControlName="search"
+      />
+    </div>
+
+    <zard-create-category-button
+      (aoCriarCategoria)="onCategoriaCriada()"
+      class="w-full md:w-auto"
+    ></zard-create-category-button>
+  </div>
+
+  <div
+    class="bg-muted/30 border border-border/50 rounded-2xl p-4 md:p-8 animate-in fade-in duration-500 delay-150"
+    style="animation-fill-mode: both"
+  >
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      @if (isLoading()) {
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <div
+            class="bg-card rounded-xl p-5 border border-border shadow-sm flex flex-col justify-between h-[240px] animate-in fade-in zoom-in-95 duration-400"
+            [style]="'animation-delay: ' + i * 60 + 'ms; animation-fill-mode: both;'"
+          >
+            <div>
+              <div class="flex items-center gap-4 mb-8">
+                <div class="w-1.5 h-10 rounded-full bg-border animate-pulse"></div>
+                <z-skeleton class="h-6 w-32 rounded-md"></z-skeleton>
+              </div>
+              <div class="space-y-3">
+                <z-skeleton class="h-3 w-36 rounded-sm"></z-skeleton>
+                <div class="flex items-baseline gap-2">
+                  <z-skeleton class="h-10 w-12 rounded-md"></z-skeleton>
+                  <z-skeleton class="h-4 w-20 rounded-sm"></z-skeleton>
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-end border-t border-border/50 pt-4">
+              <z-skeleton class="h-9 w-28 rounded-lg"></z-skeleton>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (item of categorias(); track item.id; let idx = $index) {
+          <div
+            class="bg-card text-card-foreground rounded-xl p-5 border border-border shadow-sm hover:shadow-lg hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-full min-h-[240px] animate-in fade-in zoom-in-95 slide-in-from-bottom-3"
+            [style]="
+              'animation-duration: 450ms; animation-delay: ' +
+              idx * 50 +
+              'ms; animation-fill-mode: both;'
+            "
+          >
+            <div>
+              <div class="flex items-center gap-4 mb-8">
+                <div
+                  class="w-1.5 h-10 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.3)] group-hover:shadow-[0_0_16px_rgba(var(--primary),0.5)] group-hover:h-12 transition-all duration-300"
+                ></div>
+                <h3
+                  class="font-bold text-lg md:text-xl tracking-tight group-hover:text-primary transition-colors duration-200 truncate"
+                >
+                  {{ item.nome }}
+                </h3>
+              </div>
+
+              <div class="space-y-1 mb-8">
+                <p
+                  class="text-muted-foreground text-[10px] font-bold uppercase tracking-widest opacity-70"
+                >
+                  Total de Patrimônios
+                </p>
+                <div class="flex items-baseline gap-2">
+                  <span
+                    class="text-3xl md:text-4xl font-black tracking-tighter transition-colors duration-200 group-hover:text-primary"
+                  >
+                    {{ item.totalPatrimonio }}
+                  </span>
+                  <span class="text-muted-foreground text-xs font-medium">itens vinculados</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end border-t border-border/50 pt-4 mt-auto">
+              <button
+                routerLink="/detail-category/{{ item.id }}"
+                class="group/btn flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary px-4 py-2 rounded-lg hover:bg-primary/10 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Ver detalhes
+                <lucide-angular
+                  [img]="ChevronRight"
+                  size="16"
+                  strokeWidth="3"
+                  class="transition-transform duration-200 group-hover/btn:translate-x-1.5"
+                ></lucide-angular>
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div
+            class="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in zoom-in-95 duration-500"
+            style="animation-fill-mode: both"
+          >
+            <div
+              class="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-4 animate-in zoom-in-75 duration-500 delay-100 hover:scale-110 transition-transform"
+              style="animation-fill-mode: both"
+            >
+              <lucide-angular [img]="Search" size="32" class="opacity-30"></lucide-angular>
+            </div>
+            <p
+              class="text-lg font-semibold animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+              style="animation-fill-mode: both"
+            >
+              Nenhuma categoria encontrada
+            </p>
+            <p
+              class="text-sm mt-1 animate-in fade-in slide-in-from-bottom-2 duration-400 delay-300"
+              style="animation-fill-mode: both"
+            >
+              Tente outro termo ou crie uma nova.
+            </p>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  @if (totalElements() > 0 && !isLoading()) {
+    <div
+      class="mt-8 flex justify-center animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[500ms]"
+      style="animation-fill-mode: both"
+    >
+      <zard-pagination-custom
+        [paginaAtual]="paginaAtual()"
+        [totalPaginas]="totalPaginas()"
+        (paginaChange)="onPaginaChange($event)"
+      />
+    </div>
+  }
+</div>

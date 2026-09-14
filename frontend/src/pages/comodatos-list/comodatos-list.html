@@ -1,0 +1,340 @@
+<div
+  class="px-4 py-6 md:px-5 md:py-8 bg-background text-foreground min-h-screen transition-colors duration-300"
+  [formGroup]="filtrosForm"
+>
+  <div
+    class="flex flex-col gap-1 mb-6 animate-in fade-in slide-in-from-top-3 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <h1 class="text-xl md:text-2xl font-bold text-foreground tracking-tight">Comodatos</h1>
+    <p class="text-muted-foreground text-sm">
+      Gerencie os empréstimos e termos de comodato ativos.
+    </p>
+  </div>
+
+  <div
+    class="bg-card text-card-foreground rounded-xl shadow-sm p-4 mb-6 border border-border animate-in fade-in slide-in-from-top-4 duration-500 delay-100"
+    style="animation-fill-mode: both"
+  >
+    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div
+        class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto flex-1"
+      >
+        <div class="relative w-full md:w-80 group">
+          <lucide-angular
+            [img]="Search"
+            class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary pointer-events-none"
+            size="18"
+          ></lucide-angular>
+          <input
+            type="text"
+            placeholder="Buscar por nome, e-mail ou patrimônio..."
+            formControlName="search"
+            class="w-full h-11 pl-11 pr-4 bg-background border border-input rounded-md outline-none text-sm transition-all focus:ring-2 focus:ring-ring/20 focus:border-primary"
+          />
+        </div>
+
+        <div class="w-full sm:w-48">
+          <z-select zPlaceholder="Ordenar: Vencimento" formControlName="ordenacao">
+            <z-select-item zValue="vencimento">Ordenar: Vencimento</z-select-item>
+            <z-select-item zValue="alfabetica">Ordenar: A-Z</z-select-item>
+          </z-select>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <div
+          class="flex flex-wrap items-center justify-center gap-1 text-sm font-medium text-muted-foreground bg-muted/50 p-1 rounded-xl border border-border/50 w-full sm:w-auto"
+        >
+          @for (filtro of filtrosTabs; track filtro.id) {
+            <button
+              type="button"
+              (click)="setTabFilter(filtro.id)"
+              class="flex-1 sm:flex-none px-4 py-2 rounded-lg transition-all text-center"
+              [class.bg-card]="tabAtual() === filtro.id"
+              [class.text-primary]="tabAtual() === filtro.id"
+              [class.shadow-sm]="tabAtual() === filtro.id"
+              [class.font-bold]="tabAtual() === filtro.id"
+            >
+              {{ filtro.label }}
+            </button>
+          }
+        </div>
+        <div class="w-full sm:w-auto flex">
+          <zard-create-comodato-button
+            class="w-full"
+            (onComodatoCriado)="onComodatoCriado($event)"
+          ></zard-create-comodato-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="bg-card md:bg-card text-card-foreground rounded-xl md:shadow-sm md:border border-border w-full mt-6 md:mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150"
+    style="animation-fill-mode: both"
+  >
+    <table class="w-full text-sm text-left block md:table border-spacing-0">
+      <thead
+        class="hidden md:table-header-group bg-muted/30 border-b border-border text-muted-foreground rounded-t-xl overflow-hidden"
+      >
+        <tr>
+          <th class="px-6 py-4 text-left font-semibold uppercase text-xs tracking-wider">
+            Detentor
+          </th>
+          <th class="px-6 py-4 text-left font-semibold uppercase text-xs tracking-wider">
+            Patrimônio(s)
+          </th>
+          <th class="px-6 py-4 text-left font-semibold uppercase text-xs tracking-wider">
+            Período
+          </th>
+          <th class="px-6 py-4 text-center font-semibold uppercase text-xs tracking-wider">
+            Estado
+          </th>
+          <th class="px-6 py-4 text-center font-semibold uppercase text-xs tracking-wider">
+            Ações
+          </th>
+        </tr>
+      </thead>
+
+      <tbody
+        class="block md:table-row-group divide-y-0 md:divide-y divide-border space-y-4 md:space-y-0"
+      >
+        @for (item of comodatos(); track item.uuid; let idx = $index) {
+          <tr
+            class="flex flex-col md:table-row bg-card md:bg-transparent rounded-xl md:rounded-none border border-border md:border-0 hover:bg-muted/50 transition-colors group shadow-sm md:shadow-none p-4 md:p-0 mb-4 md:mb-0 animate-in fade-in slide-in-from-bottom-2"
+            [style]="
+              'animation-duration: 400ms; animation-delay: ' +
+              idx * 40 +
+              'ms; animation-fill-mode: both;'
+            "
+          >
+            <td
+              class="px-4 py-2 md:px-6 md:py-5 flex justify-between items-start md:items-center md:table-cell border-b border-border/30 md:border-0 mt-2 md:mt-0"
+            >
+              <span class="md:hidden text-xs font-semibold text-muted-foreground uppercase mt-0.5"
+                >Detentor</span
+              >
+              <div class="flex flex-col text-right md:text-left">
+                <span class="font-bold text-foreground text-[15px]">{{ item.nome }}</span>
+                <span class="text-muted-foreground text-xs">{{ item.email }}</span>
+              </div>
+            </td>
+
+            <td
+              class="px-4 py-3 md:px-6 md:py-5 flex flex-col md:table-cell gap-2 md:gap-0 border-b border-border/30 md:border-0"
+            >
+              <span
+                class="md:hidden text-xs font-semibold text-muted-foreground uppercase w-full text-left mb-1"
+              >
+                Patrimônio(s)
+              </span>
+              <div class="flex items-center justify-start gap-2 flex-wrap w-full">
+                @for (p of item.patrimonios.slice(0, 2); track p.uuid) {
+                  <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium"
+                  >
+                    <lucide-angular
+                      [img]="Box"
+                      size="14"
+                      class="text-primary shrink-0"
+                    ></lucide-angular>
+                    <span class="truncate max-w-[150px] md:max-w-[120px]" [title]="p.numPatrimonio">
+                      {{ p.descricao }}
+                    </span>
+                  </div>
+                }
+                @if (item.patrimonios.length > 2) {
+                  <span
+                    class="px-2.5 py-1.5 bg-muted text-muted-foreground text-[11px] font-bold rounded-lg border border-border"
+                  >
+                    +{{ item.patrimonios.length - 2 }}
+                  </span>
+                }
+              </div>
+            </td>
+
+            <td
+              class="px-4 py-3 md:px-6 md:py-5 flex justify-between items-center md:table-cell border-b border-border/30 md:border-0"
+            >
+              <span class="md:hidden text-xs font-semibold text-muted-foreground uppercase"
+                >Período</span
+              >
+              <div class="flex flex-col gap-1 text-[11px] text-right md:text-left">
+                <div>
+                  <span class="text-muted-foreground">De:</span>
+                  <span class="font-semibold ml-1">{{ item.dataInicio }}</span>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Até:</span>
+                  <span class="font-semibold ml-1">{{ item.dataFimEsperado }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td
+              class="px-4 py-3 md:px-6 md:py-5 flex justify-between items-center md:table-cell md:text-center border-b border-border/30 md:border-0"
+            >
+              <span class="md:hidden text-xs font-semibold text-muted-foreground uppercase"
+                >Estado</span
+              >
+              <span
+                class="inline-flex items-center gap-1.5 justify-center px-3 py-1 rounded-full text-[11px] font-bold min-w-[80px] border"
+                [ngClass]="{
+                  'bg-green-500/10 text-green-500 border-green-500/20':
+                    item.estadoOriginal === 'ENTREGUE' || item.estado === 'Em dia',
+                  'bg-amber-500/10 text-amber-500 border-amber-500/20':
+                    item.estadoOriginal === 'PENDENTE' || item.estado === 'Pendente',
+                  'bg-red-500/10 text-red-500 border-red-500/20':
+                    item.estadoOriginal === 'ATRASADO' || item.estado === 'Nao Assinado',
+                }"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                {{ item.estado }}
+              </span>
+            </td>
+
+            <td
+              class="px-4 py-4 md:px-6 md:py-5 flex justify-center md:table-cell md:text-center border-t border-border/30 md:border-0 mt-2 md:mt-0"
+            >
+              <button
+                type="button"
+                zPopover
+                [zContent]="menuActions"
+                class="w-full md:w-auto flex justify-center items-center gap-2.5 py-3 md:p-2 bg-muted/40 md:bg-transparent text-foreground md:text-muted-foreground hover:text-primary rounded-xl md:rounded-lg border border-border/60 md:border-0 transition-all outline-none active:scale-95 group"
+              >
+                <lucide-angular
+                  [img]="MoreHorizontal"
+                  size="20"
+                  class="group-hover:scale-110 transition-transform"
+                ></lucide-angular>
+                <span class="md:hidden text-xs font-bold uppercase tracking-widest"
+                  >Ações do Comodato</span
+                >
+              </button>
+
+              <ng-template #menuActions>
+                <z-popover>
+                  <div class="w-52 flex flex-col min-w-max">
+                    <button
+                      type="button"
+                      [routerLink]="['/detail-comodato', item.uuid]"
+                      class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors w-full text-left outline-none group"
+                    >
+                      <lucide-angular
+                        [img]="Eye"
+                        size="16"
+                        class="text-blue-500 group-hover:scale-110 transition-transform"
+                      ></lucide-angular>
+                      Visualizar Detalhes
+                    </button>
+
+                    <div class="h-px bg-border my-1"></div>
+
+                    @if (
+                      !item.validacaoTermo &&
+                      item.estadoOriginal !== 'CANCELADO' &&
+                      item.estadoOriginal !== 'DEVOLVIDO'
+                    ) {
+                      <button
+                        type="button"
+                        (click)="onCancelarComodato(item)"
+                        class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-md transition-colors w-full text-left outline-none group"
+                      >
+                        <lucide-angular
+                          [img]="XCircle"
+                          size="16"
+                          class="group-hover:scale-110 transition-transform"
+                        ></lucide-angular>
+                        Cancelar Solicitação
+                      </button>
+                    }
+
+                    @if (
+                      item.validacaoTermo &&
+                      (item.estadoOriginal === 'PENDENTE' || item.estadoOriginal === 'ATRASADO')
+                    ) {
+                      <button
+                        type="button"
+                        (click)="onConfirmarEntrega(item)"
+                        class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors w-full text-left outline-none group"
+                      >
+                        <lucide-angular
+                          [img]="CheckCircle"
+                          size="16"
+                          class="text-green-500 group-hover:scale-110 transition-transform"
+                        ></lucide-angular>
+                        Confirmar Devolução
+                      </button>
+                    }
+
+                    @if (item.estadoOriginal === 'CANCELADO') {
+                      <button
+                        type="button"
+                        (click)="onExcluirComodato(item)"
+                        class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 rounded-md transition-colors w-full text-left outline-none group"
+                      >
+                        <lucide-angular
+                          [img]="Trash2"
+                          size="16"
+                          class="group-hover:scale-110 transition-transform"
+                        ></lucide-angular>
+                        Excluir Registro
+                      </button>
+                    }
+
+                    @if (item.validacaoTermo && item.estadoOriginal === 'DEVOLVIDO') {
+                      <div
+                        class="px-3 py-2 text-[10px] text-muted-foreground uppercase font-bold tracking-widest"
+                      >
+                        Comodato Finalizado
+                      </div>
+                    }
+                  </div>
+                </z-popover>
+              </ng-template>
+            </td>
+          </tr>
+        }
+
+        @if (comodatos().length === 0) {
+          <tr
+            class="block md:table-row animate-in fade-in zoom-in-95 duration-500"
+            style="animation-fill-mode: both"
+          >
+            <td
+              colspan="5"
+              class="py-20 flex md:table-cell flex-col items-center justify-center text-muted-foreground text-center"
+            >
+              <div class="flex flex-col items-center justify-center w-full">
+                <div
+                  class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-3 animate-in zoom-in-75 duration-500 delay-100"
+                  style="animation-fill-mode: both"
+                >
+                  <lucide-angular [img]="Search" size="24" class="opacity-30"></lucide-angular>
+                </div>
+                <p
+                  class="font-medium text-foreground animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+                  style="animation-fill-mode: both"
+                >
+                  Nenhum registro encontrado.
+                </p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div
+      class="p-4 border-t border-border flex justify-center bg-card rounded-b-xl animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[400ms]"
+      style="animation-fill-mode: both"
+    >
+      <zard-pagination-custom
+        [paginaAtual]="currentPage()"
+        [totalPaginas]="totalPages()"
+        (paginaChange)="onPageChange($event)"
+      />
+    </div>
+  </div>
+</div>

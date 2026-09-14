@@ -1,0 +1,362 @@
+<div
+  class="py-6 md:px-5 md:py-8 min-h-screen bg-background text-foreground transition-colors duration-300"
+  [formGroup]="detentoresForm"
+>
+  <div
+    class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 animate-in fade-in slide-in-from-top-3 duration-500"
+    style="animation-fill-mode: both"
+  >
+    <div>
+      <h1 class="text-xl md:text-2xl font-bold tracking-tight">Gestão de Detentores</h1>
+      <p class="text-muted-foreground text-sm mt-1">
+        Visão geral dos usuários e seus equipamentos vinculados.
+      </p>
+    </div>
+  </div>
+
+  <div
+    class="bg-card rounded-xl shadow-sm p-4 md:p-5 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-6 border border-border animate-in fade-in slide-in-from-top-4 duration-500 delay-100"
+    style="animation-fill-mode: both"
+  >
+    <div class="flex flex-col md:flex-row items-center gap-4 flex-1">
+      <div class="relative w-full lg:w-80 group">
+        <lucide-angular
+          [img]="icons.Search"
+          size="18"
+          class="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none"
+        ></lucide-angular>
+        <input
+          type="text"
+          z-input
+          formControlName="search"
+          class="w-full h-11 pl-11 pr-4 bg-background border border-input rounded-md outline-none text-sm transition-all focus:ring-2 focus:ring-ring/20 focus:border-primary placeholder:text-muted-foreground"
+          placeholder="Pesquisar detentor..."
+        />
+      </div>
+
+      <div class="w-full md:w-48">
+        <z-select zPlaceholder="Filtrar por Status" formControlName="filtroStatus" class="w-full">
+          <z-select-item zValue="todos" (click)="setFiltroStatus('todos')">Todos</z-select-item>
+          <z-select-item zValue="ativos" (click)="setFiltroStatus('ativos')">Ativos</z-select-item>
+          <z-select-item zValue="inativos" (click)="setFiltroStatus('inativos')"
+            >Inativos</z-select-item
+          >
+        </z-select>
+      </div>
+    </div>
+
+    <div class="w-full md:w-auto">
+      <zard-create-detentor-button
+        (onDetentorCriado)="carregarDetentores()"
+        class="w-full md:w-auto"
+      ></zard-create-detentor-button>
+    </div>
+  </div>
+
+  <div
+    class="w-full overflow-x-auto animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150"
+    style="animation-fill-mode: both"
+  >
+    <table class="w-full text-sm block md:table border-collapse">
+      <thead class="hidden md:table-header-group bg-muted/30">
+        <tr>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Detentor
+          </th>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Perfil
+          </th>
+          <th
+            class="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Patrimônios em Posse
+          </th>
+          <th
+            class="px-6 py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Status Geral
+          </th>
+          <th
+            class="px-6 py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Situação
+          </th>
+          <th
+            class="px-6 py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border"
+          >
+            Ações
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="block md:table-row-group divide-y divide-border">
+        @if (isLoading()) {
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <tr
+              class="flex flex-col md:table-row bg-card md:bg-transparent rounded-xl border border-border md:border-0 p-4 md:p-0 mb-4 md:mb-0 animate-in fade-in slide-in-from-bottom-2 duration-400"
+              [style]="'animation-delay: ' + i * 60 + 'ms; animation-fill-mode: both;'"
+            >
+              <td class="py-2 md:px-6 md:py-4">
+                <div class="flex flex-col gap-1.5">
+                  <z-skeleton class="h-4 w-36 rounded"></z-skeleton>
+                  <z-skeleton class="h-3 w-48 rounded"></z-skeleton>
+                </div>
+              </td>
+              <td class="py-2 md:px-6 md:py-4"><z-skeleton class="h-6 w-24 rounded-md" /></td>
+              <td class="py-2 md:px-6 md:py-4"><z-skeleton class="h-7 w-full rounded-lg" /></td>
+              <td class="py-2 md:px-6 md:py-4">
+                <z-skeleton class="h-6 w-20 rounded-full mx-auto" />
+              </td>
+              <td class="py-2 md:px-6 md:py-4">
+                <z-skeleton class="h-6 w-16 rounded-full mx-auto" />
+              </td>
+              <td class="py-2 md:px-6 md:py-4">
+                <z-skeleton class="h-8 w-8 rounded-lg mx-auto" />
+              </td>
+            </tr>
+          }
+        } @else {
+          @for (item of detentores(); track item.uuid; let idx = $index) {
+            <tr
+              class="flex flex-col md:table-row bg-card md:bg-card rounded-xl border border-border md:border p-4 md:p-0 mb-4 md:mb-0 hover:bg-muted/30 transition-all shadow-sm md:shadow-none animate-in fade-in slide-in-from-bottom-2"
+              [style]="
+                'animation-duration: 400ms; animation-delay: ' +
+                idx * 40 +
+                'ms; animation-fill-mode: both;'
+              "
+            >
+              <td class="flex flex-col md:table-cell px-0 md:px-6 py-2 md:py-4">
+                <span class="md:hidden text-[10px] font-bold text-muted-foreground uppercase mb-1"
+                  >Detentor</span
+                >
+                <div class="flex flex-col">
+                  <span
+                    class="font-bold md:font-semibold text-foreground"
+                    [class.opacity-50]="!item.ativo"
+                  >
+                    {{ item.nome }}
+                  </span>
+                  <span class="text-muted-foreground text-xs" [class.opacity-50]="!item.ativo">
+                    {{ item.email }}
+                  </span>
+                </div>
+              </td>
+
+              <td
+                class="flex justify-between items-center md:table-cell px-0 md:px-6 py-2 md:py-4 border-t border-border/50 md:border-0"
+              >
+                <span class="md:hidden text-[10px] font-bold text-muted-foreground uppercase"
+                  >Perfil</span
+                >
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border uppercase tracking-wide"
+                  [ngClass]="getPerfilClass(item.tipoPerfilFormatted)"
+                  [class.opacity-50]="!item.ativo"
+                >
+                  <lucide-angular
+                    [img]="getPerfilIcon(item.tipoPerfilFormatted)"
+                    size="12"
+                  ></lucide-angular>
+                  {{ item.tipoPerfilFormatted }}
+                </span>
+              </td>
+
+              <td
+                class="flex flex-col md:table-cell px-0 md:px-6 py-2 md:py-4 border-t border-border/50 md:border-0"
+              >
+                <span class="md:hidden text-[10px] font-bold text-muted-foreground uppercase mb-2"
+                  >Patrimônios em Posse</span
+                >
+                <div class="flex items-center gap-2 flex-wrap">
+                  @if (item.patrimoniosView.length > 0) {
+                    @for (pat of item.patrimoniosView.slice(0, 2); track pat.uuid) {
+                      <div
+                        class="flex items-center gap-2 px-2 py-1 bg-muted/50 border border-border rounded-md"
+                      >
+                        <div
+                          class="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          [ngClass]="{
+                            'bg-green-500': pat.statusContrato === 'DEVOLVIDO',
+                            'bg-amber-400': pat.statusContrato === 'PENDENTE',
+                            'bg-red-500': pat.statusContrato === 'ATRASADO',
+                          }"
+                        ></div>
+                        <span class="text-[11px] font-bold text-foreground">{{
+                          pat.numPatrimonio
+                        }}</span>
+                      </div>
+                    }
+                    @if (item.patrimoniosView.length > 2) {
+                      <span
+                        class="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded"
+                      >
+                        +{{ item.patrimoniosView.length - 2 }}
+                      </span>
+                    }
+                  } @else {
+                    <span class="text-muted-foreground/60 italic text-xs">Nenhum equipamento</span>
+                  }
+                </div>
+              </td>
+
+              <td
+                class="flex justify-between items-center md:table-cell px-0 md:px-6 py-2 md:py-4 border-t border-border/50 md:border-0 md:text-center"
+              >
+                <span class="md:hidden text-[10px] font-bold text-muted-foreground uppercase"
+                  >Status Geral</span
+                >
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border"
+                  [ngClass]="{
+                    'bg-green-500/10 text-green-400 border-green-500/20':
+                      item.statusGeral === 'Regular',
+                    'bg-amber-500/10 text-amber-400 border-amber-500/20':
+                      item.statusGeral === 'Pendente',
+                    'bg-red-500/10 text-red-400 border-red-500/20': item.statusGeral === 'Atrasado',
+                  }"
+                  [class.opacity-50]="!item.ativo"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                  {{ item.statusGeral }}
+                </span>
+              </td>
+
+              <td
+                class="flex justify-between items-center md:table-cell px-0 md:px-6 py-2 md:py-4 border-t border-border/50 md:border-0 md:text-center"
+              >
+                <span class="md:hidden text-[10px] font-bold text-muted-foreground uppercase"
+                  >Situação</span
+                >
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border"
+                  [ngClass]="{
+                    'bg-green-500/10 text-green-400 border-green-500/20': item.ativo,
+                    'bg-red-500/10 text-red-400 border-red-500/20': !item.ativo,
+                  }"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                  {{ item.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+
+              <td
+                class="flex justify-end md:table-cell px-0 md:px-6 py-2 md:py-4 border-t border-border/50 md:border-0 text-center"
+              >
+                <div class="flex items-center justify-end md:justify-center w-full">
+                  <button
+                    type="button"
+                    zPopover
+                    [zContent]="menuActions"
+                    class="text-muted-foreground hover:text-primary p-2 rounded-lg hover:bg-muted transition-all outline-none active:scale-95"
+                  >
+                    <lucide-angular [img]="icons.MoreHorizontal" size="20"></lucide-angular>
+                  </button>
+                </div>
+
+                <ng-template #menuActions>
+                  <z-popover>
+                    <div class="w-48 p-1 flex flex-col min-w-max">
+                      <button
+                        type="button"
+                        [routerLink]="['/detail-detentor', item.uuid]"
+                        class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors w-full text-left outline-none"
+                      >
+                        <lucide-angular
+                          [img]="icons.User"
+                          size="16"
+                          class="text-blue-400"
+                        ></lucide-angular>
+                        Ver Detentor
+                      </button>
+
+                      <div class="my-1 border-t border-border"></div>
+
+                      @if (item.ativo) {
+                        <button
+                          type="button"
+                          (click)="onToggleStatus(item)"
+                          class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors w-full text-left outline-none"
+                        >
+                          <lucide-angular
+                            [img]="icons.XCircle"
+                            size="16"
+                            class="text-amber-500"
+                          ></lucide-angular>
+                          Desativar Detentor
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          (click)="onToggleStatus(item)"
+                          class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors w-full text-left outline-none"
+                        >
+                          <lucide-angular
+                            [img]="icons.CheckCircle"
+                            size="16"
+                            class="text-green-500"
+                          ></lucide-angular>
+                          Ativar Detentor
+                        </button>
+                        <button
+                          type="button"
+                          (click)="onExcluir(item)"
+                          class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 rounded-md transition-colors w-full text-left outline-none mt-1"
+                        >
+                          <lucide-angular [img]="icons.Trash2" size="16"></lucide-angular>
+                          Excluir Detentor
+                        </button>
+                      }
+                    </div>
+                  </z-popover>
+                </ng-template>
+              </td>
+            </tr>
+          }
+
+          @if (detentores().length === 0) {
+            <tr
+              class="block md:table-row animate-in fade-in zoom-in-95 duration-500"
+              style="animation-fill-mode: both"
+            >
+              <td colspan="6" class="py-20 text-center bg-card block md:table-cell">
+                <div class="flex flex-col items-center justify-center text-muted-foreground">
+                  <div
+                    class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-3 animate-in zoom-in-75 duration-500 delay-100"
+                    style="animation-fill-mode: both"
+                  >
+                    <lucide-angular
+                      [img]="icons.Search"
+                      size="24"
+                      class="opacity-30"
+                    ></lucide-angular>
+                  </div>
+                  <p
+                    class="font-medium animate-in fade-in slide-in-from-bottom-2 duration-400 delay-200"
+                    style="animation-fill-mode: both"
+                  >
+                    Nenhum detentor encontrado.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="p-4 border border-border bg-card flex justify-center shadow-sm mt-0 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[400ms]"
+    style="animation-fill-mode: both"
+  >
+    <zard-pagination-custom
+      [paginaAtual]="currentPage()"
+      [totalPaginas]="totalPages()"
+      (paginaChange)="onPageChange($event)"
+    />
+  </div>
+</div>

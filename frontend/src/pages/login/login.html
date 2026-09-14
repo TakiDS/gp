@@ -1,0 +1,287 @@
+<style>
+  @keyframes float-blob {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+      transform: translate(2%, 3%) scale(1.04);
+    }
+
+    66% {
+      transform: translate(-2%, -2%) scale(0.97);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-left {
+    from {
+      opacity: 0;
+      transform: translateX(-32px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-right {
+    from {
+      opacity: 0;
+      transform: translateX(32px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.94) translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes line-grow {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .anim-blob-1 {
+    animation: float-blob 12s ease-in-out infinite;
+  }
+
+  .anim-blob-2 {
+    animation: float-blob 15s ease-in-out infinite reverse;
+  }
+
+  .anim-fade-left {
+    animation: fade-left 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  }
+
+  .anim-fade-up {
+    animation: fade-up 0.6s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  }
+
+  .anim-fade-right {
+    animation: fade-right 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  }
+
+  .anim-fade-in {
+    animation: fade-in 0.6s ease both;
+  }
+
+  .anim-scale-in {
+    animation: scale-in 0.7s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  }
+
+  .anim-line-grow {
+    animation: line-grow 0.6s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    transform-origin: left;
+  }
+
+  .d-100 {
+    animation-delay: 100ms;
+  }
+
+  .d-150 {
+    animation-delay: 150ms;
+  }
+
+  .d-200 {
+    animation-delay: 200ms;
+  }
+
+  .d-250 {
+    animation-delay: 250ms;
+  }
+
+  .d-300 {
+    animation-delay: 300ms;
+  }
+
+  .d-350 {
+    animation-delay: 350ms;
+  }
+
+  .d-400 {
+    animation-delay: 400ms;
+  }
+
+  .d-450 {
+    animation-delay: 450ms;
+  }
+
+  .d-500 {
+    animation-delay: 500ms;
+  }
+
+  .d-550 {
+    animation-delay: 550ms;
+  }
+
+  .d-600 {
+    animation-delay: 600ms;
+  }
+
+  .d-700 {
+    animation-delay: 700ms;
+  }
+
+  .d-800 {
+    animation-delay: 800ms;
+  }
+</style>
+
+<main
+  class="relative min-h-[100dvh] bg-background text-foreground transition-colors duration-500">
+  <div class="absolute top-6 right-6 z-50 anim-fade-in d-800">
+    <button z-button zType="ghost" zSize="sm" (click)="toggleTheme()"
+      class="text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-300 border border-border backdrop-blur-md">
+      <z-icon zType="dark-mode" class="size-4.5" />
+      <span class="sr-only">Toggle theme</span>
+    </button>
+  </div>
+
+  <div class="grid min-h-[100dvh] grid-cols-1 lg:grid-cols-2">
+    <section class="relative hidden lg:flex flex-col justify-center px-16 overflow-hidden bg-[#1e2337]"
+      aria-label="Apresentação">
+      <div
+        class="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[#3A4474]/20 blur-[120px] rounded-full anim-blob-1">
+      </div>
+      <div
+        class="absolute -bottom-[10%] -right-[5%] w-[50%] h-[50%] bg-blue-500/10 blur-[100px] rounded-full anim-blob-2">
+      </div>
+
+      <div class="relative z-10">
+        <img class="w-[200px] mb-12 drop-shadow-2xl anim-fade-left" src="/assets/giap-logo-white.svg" alt="GIAP Logo" />
+
+        <div class="w-12 h-0.5 bg-blue-400 mb-6 anim-line-grow d-200"></div>
+
+        <h2 class="text-4xl font-bold text-white tracking-tight leading-tight max-w-md anim-fade-up d-250">
+          Gestão inteligente de <span class="text-blue-400">patrimônios</span> em um só lugar.
+        </h2>
+        <p class="mt-6 max-w-sm text-lg text-slate-400 leading-relaxed anim-fade-up d-400">
+          Segurança, agilidade e clareza para o controle de notas fiscais e bens corporativos.
+        </p>
+      </div>
+    </section>
+
+    <section class="relative flex items-center justify-center px-6 py-12 bg-background transition-colors duration-500">
+      <div class="absolute lg:hidden inset-0 bg-primary/5 blur-3xl"></div>
+
+      <div class="w-full max-w-[440px] relative z-10">
+        <div class="mb-10 lg:hidden flex justify-center anim-fade-in">
+          <img class="h-12 block dark:hidden" src="/assets/giap-logo.svg" alt="GIAP Logo" />
+          <img class="h-12 hidden dark:block" src="/assets/giap-logo-white.svg" alt="GIAP Logo" />
+        </div>
+
+        <div
+          class="rounded-3xl bg-card text-card-foreground p-8 md:p-12 border border-border shadow-xl transition-all duration-500 anim-scale-in d-100">
+          <header class="mb-10 anim-fade-up d-200">
+            <h1 class="text-2xl font-bold tracking-tight">Bem-vindo de volta</h1>
+            <p class="text-muted-foreground mt-2">Acesse sua conta para gerenciar os dados.</p>
+          </header>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="space-y-2 anim-fade-up d-300">
+              <label for="email" class="text-[11px] font-black uppercase tracking-[0.15em] text-muted-foreground ml-1">
+                E-mail Corporativo
+              </label>
+              <div class="relative group">
+                <input id="email" type="email" formControlName="email" placeholder="Digite seu email"
+                  class="w-full h-12 px-4 bg-muted/30 border border-input rounded-md text-sm text-foreground selection:bg-selection-color placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary"
+                  [ngClass]="{
+                    'border-destructive/50 bg-destructive/5':
+                      f['email'].invalid && f['email'].touched,
+                  }" />
+              </div>
+            </div>
+
+            <div class="space-y-2 anim-fade-up d-400">
+              <div class="flex justify-between items-end px-1">
+                <label for="password" class="text-[11px] font-black uppercase tracking-[0.15em] text-muted-foreground">
+                  Senha
+                </label>
+                <a routerLink="/forgot-password"
+                  class="text-[11px] font-semibold text-primary hover:opacity-80 transition-opacity">
+                  Esqueceu a senha?
+                </a>
+              </div>
+              <div class="relative">
+                <input id="password" [type]="mostrarSenha ? 'text' : 'password'" formControlName="password"
+                  placeholder="Digite sua senha"
+                  class="w-full h-12 px-4 pr-11 bg-muted/30 border border-input rounded-md text-sm text-foreground selection:bg-selection-color placeholder:text-muted-foreground/50 outline-none transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary" />
+                <button type="button" (click)="mostrarSenha = !mostrarSenha"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+                  [attr.aria-label]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'">
+                  <lucide-angular [img]="mostrarSenha ? EyeOff : Eye" size="18"></lucide-angular>
+                </button>
+              </div>
+            </div>
+
+            <div class="anim-fade-up d-500">
+              <button type="submit" [disabled]="loginForm.invalid"
+                class="relative group w-full h-12 mt-2 flex items-center justify-center overflow-hidden rounded-xl bg-brand-color text-white font-bold tracking-wide shadow-[0_10px_20px_-10px_rgba(33,45,107,0.6)] transition-all duration-300 hover:shadow-[0_15px_30px_-10px_rgba(33,45,107,0.5)] active:scale-[0.98] disabled:bg-brand-color disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer">
+                <span class="relative z-10 flex items-center gap-2">
+                  Entrar no sistema
+                  <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+                <div
+                  class="absolute inset-0 bg-gradient-to-b from-white/5 to-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+              </button>
+            </div>
+
+            <footer class="pt-8 flex flex-col items-center gap-4 anim-fade-in d-700">
+              <div class="h-px w-full bg-border/50"></div>
+              <p class="text-[11px] text-muted-foreground font-medium tracking-wide">
+                © {{ currentYear }} GIAP · Todos os direitos reservados
+              </p>
+            </footer>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

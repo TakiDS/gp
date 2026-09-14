@@ -1,0 +1,28 @@
+<div
+  class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between h-full transition-shadow hover:shadow-md"
+>
+  <div class="flex items-center gap-4 mb-4">
+    <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+      <i [class]="icone"></i>
+    </div>
+    <h3 class="font-bold text-lg text-gray-800">{{ titulo }}</h3>
+  </div>
+
+  <div class="mb-6">
+    <p class="text-sm text-gray-500 mb-1">{{ labelQuantidade }}</p>
+    <span class="text-3xl font-bold text-gray-900">{{ quantidade }}</span>
+  </div>
+
+  <div class="flex justify-end mt-auto">
+    <button
+      class="group flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+    >
+      Ver detalhes
+      <lucide-angular
+        [img]="ChevronRight"
+        size="16"
+        class="transition-transform group-hover:translate-x-1"
+      ></lucide-angular>
+    </button>
+  </div>
+</div>

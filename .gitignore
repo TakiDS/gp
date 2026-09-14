@@ -1,0 +1,21 @@
+# Segredos e certificados
+**/.env
+**/application-prod.properties
+*.pfx
+*.p12
+
+# Artefatos de build e dependências
+**/target/
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+backend/temp_m2_repo/
+backend/immudb_states/
+
+# Arquivos temporários e de backup
+*.bak
+*.stackdump
+*.log
+.DS_Store
+Thumbs.db

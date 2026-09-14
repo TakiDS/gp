@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Termo de Comodato</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 10px;
+        }
+        .header-sub {
+            font-size: 10pt;
+            font-weight: normal;
+            margin-top: 5px;
+            text-transform: none;
+        }
+        .title {
+            margin-top: 15px;
+            font-size: 13pt;
+            display: block;
+        }
+        .content {
+            text-align: justify;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        .table-itens {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .table-itens th, .table-itens td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            font-size: 10pt;
+        }
+        .table-itens th {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: right;
+            font-style: italic;
+        }
+        .signature-container {
+            margin-top: 60px;
+            width: 100%;
+            display: flex;
+        }
+        .signature-box {
+            text-align: center;
+            margin-top: 100px;
+        }
+        .line {
+            width: 300px;
+            border-top: 1px solid #000;
+            margin: 0 auto 5px auto;
+        }
+        .role {
+            font-size: 9pt;
+            display: block;
+            color: #444;
+        }
+        .block-text {
+            display: block;
+        }
+        .sla {
+            color: rgb(19, 146, 19);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        Universidade Federal do Acre <br />
+        <div class="header-sub">
+            Pró-Reitoria de Pesquisa e Pós-Graduação <br />
+            Programa de Pós-Graduação em Ciência da Computação
+        </div>
+        <span class="title"><b>Projeto Web Academy: Capacitação em Desenvolvimento Web Full-Stack</b></span>
+        <div style="margin-top: 20px;">TERMO DE COMPROMISSO/CESSÃO DE MATERIAL</div>
+    </div>
+
+    <div class="content">
+        Eu, <strong th:text="${comodato.titular.nome}"></strong>, 
+        portador do CPF nº <strong th:text="${cpfTitular}"></strong>, 
+        <strong th:text="${termo.modalidade.descricao ?: ''}"></strong> confirmo que de acordo com o presente termo de compromisso/devolução de material,
+        recebi o material especificado na tabela abaixo, de propriedade do Projeto Web Academy, parceria firmada entre a
+        FUNDAPE, UFAC, MOTOROLA E FLEXTRONICS, para uso no período de 
+        <strong th:text="${dataInicioFormatada}"></strong>
+        a <strong th:text="${dataFimFormatada}"></strong>, 
+        assumindo o compromisso de guarda adequada utilização, de acordo com as recomendações do fabricante e posterior devolução após o término do período de comodato ou a qualquer momento quando solicitado pela Coordenação deste Projeto, 
+        nas mesmas condições de empréstimo.
+    </div>
+
+    <table class="table-itens">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Equipamento</th>
+                <th>Nº Patrimônio</th>
+                <th>Nº Série</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="patrimonio, iter : ${comodato.patrimonios}">
+                <td th:text="${iter.count}">1</td>
+                <td th:text="${patrimonio.patrimonioGeral?.descricao ?: 'N/A'}"></td>
+                <td th:text="${patrimonio.numPatrimonio}"></td>
+                <td th:text="${patrimonio.numSerie ?: 'N/A'}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Rio Branco - Acre, <span th:text="${dataFormatada}"></span>.
+    </div>
+
+    <div class="signature-container">
+        <div class="signature-box">
+            <div class="line"></div>
+            <strong th:text="${comodato.titular.nome}">NOME DO TITULAR</strong> <br />
+            <span class="role">Requerente / Responsável pelo Bem</span>
+        </div>
+
+        <div class="signature-box">
+            <div class="line"></div>
+            <strong>Daricélio Moreira Soares</strong> <br />
+            <span class="role">Coordenador do Projeto Web Academy</span>
+        </div>
+    </div>
+
+</body>
+</html>

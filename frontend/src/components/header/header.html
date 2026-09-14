@@ -1,0 +1,70 @@
+<style>
+  @keyframes fade-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .anim-header {
+    animation: fade-down 0.5s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  }
+  .anim-logo {
+    animation: fade-down 0.5s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+    animation-delay: 60ms;
+  }
+  .anim-right {
+    animation: fade-in 0.5s ease both;
+    animation-delay: 120ms;
+  }
+</style>
+
+<header
+  class="fixed top-0 left-0 right-0 h-16 md:h-20 bg-background text-foreground px-4 md:px-44 flex items-center justify-between border-b border-border transition-colors duration-300 z-[100] anim-header"
+>
+  <div class="flex items-center w-10 md:w-auto">
+    <button
+      z-button
+      zType="ghost"
+      zSize="sm"
+      class="md:hidden p-2 -ml-2"
+      (click)="sidebarService.toggle()"
+    >
+      <lucide-angular
+        [img]="sidebarService.isOpen() ? CloseIcon : MenuIcon"
+        size="22"
+        class="text-foreground"
+      ></lucide-angular>
+    </button>
+
+    <img src="../assets/giap-logo.svg" class="w-[140px] hidden md:block dark:hidden" alt="Logo" />
+    <img src="../assets/giap-logo-white.svg" class="w-[140px] hidden md:dark:block" alt="Logo" />
+  </div>
+
+  <div class="absolute left-1/2 -translate-x-1/2 md:hidden pointer-events-none anim-logo">
+    <img src="../assets/giap-logo.svg" class="w-[100px] block dark:hidden" alt="Logo" />
+    <img src="../assets/giap-logo-white.svg" class="w-[100px] hidden dark:block" alt="Logo" />
+  </div>
+
+  <div class="flex items-center justify-end gap-2 md:gap-4 min-w-[40px] md:w-auto anim-right">
+    <button z-button zType="ghost" zSize="sm" (click)="toggleTheme()">
+      <z-icon zType="dark-mode" class="size-4.5" />
+      <span class="sr-only">Toggle theme</span>
+    </button>
+
+    <z-dropdown-profile />
+  </div>
+</header>
+
+<div class="h-16 md:h-20"></div>

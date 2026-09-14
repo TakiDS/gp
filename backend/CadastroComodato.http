@@ -1,0 +1,10 @@
+POST http://localhost:8080/comodato/cadastrar
+Content-Type: application/json
+
+{
+  "dataInicio": "2026-01-20",
+  "dataFimEsperado": null,
+  "dataFim": null,
+  "validacaoTermo": true,
+  "termoUrl": "https://meusistema.com/termos/termo-comodato-001.pdf"
+}

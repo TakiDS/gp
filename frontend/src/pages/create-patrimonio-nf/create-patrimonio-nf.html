@@ -1,0 +1,144 @@
+<!-- Modal "Criar patrimônio" - TailwindCSS -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+  <!-- Modal -->
+  <div class="relative w-full max-w-[980px] bg-white">
+    <!-- Close -->
+    <button
+      type="button"
+      onclick="window.history.back()"
+      class="absolute right-8 top-6 inline-flex h-8 w-8 items-center justify-center text-gray-900 rounded-full
+         transition-colors duration-200 hover:bg-gray-200 hover:text-black
+         focus:outline-none focus:ring-2 focus:ring-red-300 cursor-p"
+      aria-label="Fechar"
+    >
+      ✕
+    </button>
+
+    <!-- Header -->
+    <div class="pt-10">
+      <h2 class="text-center text-[20px] font-semibold text-gray-900">
+        Criar patrimônio
+      </h2>
+      <p class="mt-3 text-center text-[14px] text-gray-700">
+        Escolha uma opção para criar o patrimônio:
+      </p>
+    </div>
+
+    <!-- Cards -->
+    <div class="px-16 pb-14 pt-10">
+      <div class="mx-auto grid max-w-2-[720px] grid-cols-1 gap-14 md:grid-cols-2">
+
+        <!-- ================= CARD 1 ================= -->
+        <div class="rounded-2xld-[4px] border-2 rounded-xl bg-white px-10 py-9">
+          <div class="flex justify-center">
+            <!-- Ícone -->
+            <svg viewBox="0 0 64 64" class="h-16 w-16" fill="none" stroke="currentColor" stroke-width="2.4">
+              <path d="M22 10h16l10 10v30a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z"/>
+              <path d="M38 10v10h10"/>
+              <path class="text-emerald-500" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                d="M26 35l6 6 12-14"/>
+            </svg>
+          </div>
+
+          <h3 class="mt-4 text-center text-[13px] font-semibold text-gray-900">
+            Com nota fiscal
+          </h3>
+
+          <p class="mx-auto mt-3 max-w-2-[240px] text-center text-[11px] leading-2ing-[15px] text-gray-700">
+            Envie uma Nota Fiscal (PDF ou XML) e<br />
+            crie patrimônios automaticamente<br />
+            pelos dados da nota.
+          </p>
+
+          <!-- INPUT FILE (escondido) -->
+          <input
+            id="fileNotaFiscal"
+            type="file"
+            accept=".pdf,.xml"
+            class="hidden"
+          />
+
+          <!-- BOTÃO SELECIONAR ARQUIVO-->
+          <div class="mt-7 flex justify-center">
+            <button
+              type="button"
+              onclick="document.getElementById('fileNotaFiscal').click()"
+              class="h-10 w-[220px] rounded-[3px] bg-blue-600 text-[12px] font-medium text-white hover:bg-blue-700"
+            >
+              Criar com Nota Fiscal
+            </button>
+          </div>
+
+          <!-- Nome do arquivo -->
+          <p id="nomeNotaFiscal" class="mt-3 text-center text-[11px] text-gray-500"></p>
+        </div>
+
+        <!-- ================= CARD 2 ================= -->
+        <div class="rounded-2xl-[4px] border-2 rounded-xl px-10 py-9">
+          <div class="flex justify-center">
+            <!-- Ícone -->
+            <svg viewBox="0 0 64 64" class="h-16 w-16" fill="none" stroke="currentColor" stroke-width="2.4">
+              <path d="M22 10h16l10 10v30a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z"/>
+              <path d="M38 10v10h10"/>
+              <path class="text-emerald-500" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                d="M26 30h12M26 35h10"/>
+              <path class="text-emerald-500" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                d="M40 40l10-10 4 4-10 10-5 1 1-5z"/>
+            </svg>
+          </div>
+
+          <h3 class="mt-4 text-center text-[13px] font-semibold text-gray-900">
+            Manual
+          </h3>
+
+          <p class="mx-auto mt-3 max-w-2[240px] text-center text-[11px] leading-2g-[15px] text-gray-700">
+            Preencha os dados do patrimônio<br />
+            manualmente através de um<br />
+            formulário.
+          </p>
+
+          <!-- ABRE FORMULÁRIO -->
+          <input
+            id="fileManual"
+            type="file"
+            accept=".csv,.xlsx,.xls,.json,.pdf"
+            class="hidden"
+          />
+
+          <!-- BOTÃO -->
+          <div class="mt-7 flex justify-center">
+            <button
+              type="button"
+              onclick="document.getElementById('fileManual').click()"
+              class="h-10 w-[220px] rounded-[3px] bg-blue-600 text-[12px] font-medium text-white hover:bg-blue-700"
+            >
+              Criar manualmente
+            </button>
+          </div>
+
+          <!-- Nome do arquivo -->
+          <p id="nomeManual" class="mt-3 text-center text-[11px] text-gray-500"></p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="h-10"></div>
+  </div>
+</div>
+
+<script>
+  const nf = document.getElementById("fileNotaFiscal");
+  const nfName = document.getElementById("nomeNotaFiscal");
+
+  const manual = document.getElementById("fileManual");
+  const manualName = document.getElementById("nomeManual");
+
+  nf.addEventListener("change", () => {
+    nfName.textContent = nf.files.length ? `Selecionado: ${nf.files[0].name}` : "";
+  });
+
+  manual.addEventListener("change", () => {
+    manualName.textContent = manual.files.length ? `Selecionado: ${manual.files[0].name}` : "";
+  });
+</script>
