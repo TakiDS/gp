@@ -28,7 +28,7 @@
     "@angular/core": "20.3.31",
     "@angular/forms": "20.3.31",
     "@angular/platform-browser": "20.3.31",
-    "@angular/router": "20.3.31",
+    "@angular/router": "22.1.6",
     "@tailwindcss/vite": "4.3.3",
     "apexcharts": "^5.3.6",
     "class-variance-authority": "^0.7.1",
