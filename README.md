@@ -33,6 +33,10 @@ Depois da primeira inicialização, altere `BOOTSTRAP_ADMIN_ENABLED` para `false
 
 ### 2. Suba o backend
 
+Na primeira execução, o Docker Compose cria automaticamente o servidor MySQL, o banco
+`sgp`, o usuário configurado e as tabelas da aplicação. Os dados são preservados no
+volume nomeado `mysql-data`.
+
 ```bash
 cd backend
 docker compose up -d --build
